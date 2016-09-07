@@ -1,7 +1,6 @@
 ---
-layout: archive
+layout: home
 permalink: /
-title: "Latest Posts"
 ---
 
 <div class="tiles">
