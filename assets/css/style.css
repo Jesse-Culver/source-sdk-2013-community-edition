@@ -418,7 +418,7 @@
 			}
 			.image.discord
 			{
-				display: none;
+				display: inline;
 				width: 52;
 				height: 52;
 				margin: 0 2em 2em 0;
