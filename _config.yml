@@ -1,4 +1,4 @@
-name: Dopetrope
-description: Dopetrope template for Jekyll
+name: Source Community Edition
+description: Branch of the 2013 Source Engine by the community for the community
 paginate: 10
 baseurl: '/SourceCommunityEdition'
