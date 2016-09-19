@@ -13,12 +13,12 @@
 		font-size: 13pt;
 		line-height: 1.75em;
 	}
-	
+
 	h2
 	{
 		font-size: 1.5em;
 	}
-	
+
 	h3
 	{
 		font-size: 1.35em;
@@ -30,7 +30,7 @@
 		{
 			margin: 0 0 1.5em 0;
 		}
-		
+
 			header > p
 			{
 				margin: 0.5em 0 0 0;
@@ -46,14 +46,14 @@
 		{
 			margin: 2.25em 0 0 0;
 		}
-	
+
 	/* Box */
 
 		.box
 		{
 			padding: 2.75em 1.75em 2.75em 1.75em;
 		}
-		
+
 			.box .image.featured
 			{
 				left: 1.75em;
@@ -64,19 +64,19 @@
 			.box.post
 			{
 			}
-			
+
 				.box.post header
 				{
 					padding-top: 1em;
 					margin: 0 0 2em 0;
 				}
-			
+
 				.box.post h2
 				{
 					font-size: 2.5em;
 					letter-spacing: -0.015em;
 				}
-				
+
 				.box.post header > p
 				{
 					margin-top: 1.25em;
@@ -84,7 +84,7 @@
 				}
 
 	/* Button */
-	
+
 		input[type="button"],
 		input[type="submit"],
 		input[type="reset"],
@@ -108,13 +108,13 @@
 		ul.actions
 		{
 		}
-		
+
 			ul.actions li
 			{
 				display: inline-block;
 				margin-left: 1em;
 			}
-			
+
 			ul.actions li:first-child
 			{
 				margin-left: 0;
@@ -131,7 +131,7 @@
 				padding: 0 0 0 1em;
 				margin: 0 0 0 1em;
 			}
-			
+
 			ul.links li:first-child
 			{
 				border-left: 0;
@@ -172,7 +172,7 @@
 		{
 			margin: 0 0 3em 0;
 		}
-		
+
 			#footer-wrapper header h2
 			{
 				font-size: 1.75em;
@@ -186,7 +186,7 @@
 	{
 		text-align: center;
 	}
-	
+
 		#header h1
 		{
 			color: #252122;
@@ -220,7 +220,7 @@
 			font-style: italic;
 			margin: 0 0.35em 0 0.35em;
 		}
-		
+
 			#nav > ul > li > a
 			{
 				border-radius: 5px;
@@ -238,32 +238,32 @@
 		#nav > ul > li:hover
 		{
 		}
-		
+
 			#nav > ul > li:hover > a
 			{
 				background: #f3f3f3;
 			}
-			
+
 		#nav > ul > li.active
 		{
 		}
-		
+
 			#nav > ul > li.active > a
 			{
 				background: #f3f3f3;
 			}
-			
+
 		#nav > ul > li.current
 		{
 		}
-		
+
 			#nav > ul > li.current > a
 			{
-				background: #d52349;
+				background: #F79A10;
 				color: #fff !important;
 				font-weight: 700;
 			}
-			
+
 	.dropotron
 	{
 		border-radius: 5px;
@@ -277,7 +277,7 @@
 		margin-top: -1.25em;
 		margin-left: -1px;
 	}
-	
+
 		.dropotron a,
 		.dropotron span
 		{
@@ -289,7 +289,7 @@
 			-ms-transition: color .25s ease-in-out;
 			transition: color .25s ease-in-out;
 		}
-		
+
 		.dropotron li
 		{
 			padding: 0.25em 0 0.25em 0;
@@ -305,7 +305,7 @@
 		{
 			margin-top: 2em;
 		}
-		
+
 			.dropotron.level-0:before
 			{
 				content: '';
@@ -330,14 +330,14 @@
 		padding: 8em 0;
 		margin: 4em 0 0 0;
 	}
-	
+
 		#banner header
 		{
 			display: inline-block;
 			padding: 2.5em 5em;
 			border-radius: 5px;
 		}
-		
+
 			#banner header h2
 			{
 				font-size: 2.5em;
@@ -348,7 +348,7 @@
 			{
 				font-size: 1.5em;
 			}
-			
+
 /*********************************************************************************/
 /* Footer                                                                        */
 /*********************************************************************************/
@@ -373,7 +373,7 @@
 	{
 		overflow: hidden;
 	}
-	
+
 		#intro section
 		{
 			margin: 3em 0;
@@ -384,18 +384,18 @@
 		{
 			font-size: 1.75em;
 		}
-		
+
 		#intro p
 		{
 			margin: 0;
 		}
-	
+
 		#intro .middle
 		{
 			position: relative;
 			z-index: 1;
 		}
-		
+
 			#intro .middle:before
 			{
 				content: '';
@@ -431,7 +431,7 @@
 								-32px -32px 0 0 #fff,
 								0 0 32px 0 rgba(0,0,0,0.15);
 			}
-		
+
 		#intro .button
 		{
 			min-width: 12em;
@@ -445,12 +445,12 @@
 /*********************************************************************************/
 /* Copyright                                                                     */
 /*********************************************************************************/
-		
+
 	#copyright
 	{
 		margin: 3em 0 2em 0;
 	}
-	
+
 		#copyright .links
 		{
 			padding: 0.85em 2.25em 0.85em 2.25em;
