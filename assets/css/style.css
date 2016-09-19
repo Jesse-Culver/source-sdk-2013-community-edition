@@ -418,9 +418,10 @@
 			}
 			.image.discord
 			{
-				display: inline;
-				width: 52;
-				height: 52;
+				display: inline-block;
+				width: 3em;
+				height: 3em;
+				background-color: transparent;
 				margin: 0 2em 2em 0;
 			}
 	/* List */
