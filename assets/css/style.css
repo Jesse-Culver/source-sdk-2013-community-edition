@@ -589,18 +589,10 @@
 						line-height: 1.5em;
 					}
 
-				ul.social li a.fa-facebook			{ background: #3c5a98; }
-				ul.social li a.fa-facebook:hover	{ background: #4c6aa8; }
-				ul.social li a.fa-twitter			{ background: #2daae4; }
-				ul.social li a.fa-twitter:hover		{ background: #3dbaf4; }
-				ul.social li a.fa-dribbble			{ background: #c4376b; }
-				ul.social li a.fa-dribbble:hover	{ background: #d4477b; }
-				ul.social li a.fa-linkedin			{ background: #006599; }
-				ul.social li a.fa-linkedin:hover	{ background: #1075a9; }
-				ul.social li a.fa-tumblr			{ background: #2b4661; }
-				ul.social li a.fa-tumblr:hover		{ background: #3b5671; }
-				ul.social li a.fa-google-plus		{ background: #da2713; }
-				ul.social li a.fa-google-plus:hover	{ background: #ea3723; }
+				ul.social li a.fa-github			{ background: ##222222; }
+				ul.social li a.fa-github:hover	{ background: #545454; }
+				ul.social li a.fa-steam		{ background: #666666; }
+				ul.social li a.fa-steam:hover	{ background: #757575; }
 
 		ol
 		{
