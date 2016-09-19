@@ -416,7 +416,13 @@
 				float: left;
 				margin: 0 2em 2em 0;
 			}
-
+			.image.discord
+			{
+				display: block;
+				width: 52;
+				height: 52;
+				margin: 0 2em 2em 0;
+			}
 	/* List */
 
 		ul
