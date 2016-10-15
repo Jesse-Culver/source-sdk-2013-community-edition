@@ -79,9 +79,9 @@ extern int gEvilImpulse101;
 
 ConVar sv_autojump( "sv_autojump", "0" );
 
-ConVar hl2_walkspeed( "hl2_walkspeed", "150" );
-ConVar hl2_normspeed( "hl2_normspeed", "190" );
-ConVar hl2_sprintspeed( "hl2_sprintspeed", "320" );
+ConVar hl2_walkspeed( "hl2_walkspeed", "130" );
+ConVar hl2_normspeed( "hl2_normspeed", "180" );
+ConVar hl2_sprintspeed( "hl2_sprintspeed", "275" );
 
 ConVar hl2_darkness_flashlight_factor ( "hl2_darkness_flashlight_factor", "1" );
 
@@ -108,7 +108,7 @@ ConVar autoaim_unlock_target( "autoaim_unlock_target", "0.8666" );
 ConVar sv_stickysprint("sv_stickysprint", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX);
 
 #define	FLASH_DRAIN_TIME	 1.1111	// 100 units / 90 secs
-#define	FLASH_CHARGE_TIME	 50.0f	// 100 units / 2 secs
+#define	FLASH_CHARGE_TIME	 25.0f	// 100 units / 4 secs
 
 
 //==============================================================================================
