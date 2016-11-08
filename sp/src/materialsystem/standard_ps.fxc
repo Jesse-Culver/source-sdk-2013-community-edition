@@ -1,0 +1,145 @@
+
+// Combos
+// DYNAMIC: "NUM_LIGHTS"		"0..4"
+
+// Includes
+#include "common_ps_fxc.h"
+#include "common_vertexlitgeneric_dx9.h"
+#include "common_lightmappedgeneric_fxc.h"
+#include "common_flashlight_fxc.h"
+//#include "common_parallax.h"
+
+
+// Samplers
+sampler smBaseTex		: register( s0 );
+sampler smNormalMap		: register( s1 );
+sampler smGloss		: register( s2 );
+sampler smRefl		: register( s3 );
+sampler smAO		: register( s4 );
+sampler smCubemap		: register( s5 );
+
+// Constants
+const float2 g_cData_tiling		: register( c16 ); 		// Static
+const float3 g_cAmbientCube[6]		: register( c0 );
+PixelShaderLightInfo g_cLightInfo[3]		: register( c6 );
+
+
+float Vis_SmithJointApprox( float Roughness, float NoV, float NoL )
+{
+	float a = Roughness * Roughness;
+	float Vis_SmithV = NoL * ( NoV * ( 1 - a ) + a );
+	float Vis_SmithL = NoV * ( NoL * ( 1 - a ) + a );
+	return 0.5 * (1 / (Vis_SmithV + Vis_SmithL) );
+}
+
+const static float PI = 3.1415926535897932f;
+
+float D_GGX( float Roughness, float NoH )
+{
+	float a = Roughness * Roughness;
+	float a2 = a * a;
+	float d = ( NoH * a2 - NoH ) * NoH + 1;	// 2 mad
+	return a2 / ( PI*d*d );					// 4 mul, 1 rcp
+}
+
+
+void SpecularVisTerm( in float3 WPos, in float3 WNormal, in float3 EyeToWorld, in float Roughness, out float Vis )
+{
+	float3 ViewDir = EyeToWorld * -1; // Make it World->Eye
+
+	Vis = 0;
+	
+	float3 LColor;
+	float3 LDir;
+
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		GetLightData(g_cLightInfo, i, WPos, LColor, LDir);
+
+		float NdotL = saturate(dot(WNormal, LDir * -1));
+		float NdotV = saturate(abs( dot(WNormal, ViewDir) ) + 1e-5 );
+		
+		Vis = Vis_SmithJointApprox(Roughness, NdotV, NdotL);
+	}
+	
+}
+
+
+void DistTerm( in float3 WPos, in float3 WNormal, in float3 EyeToWorld, in float Roughness, out float D )
+{
+	float3 ViewDir = EyeToWorld * -1; // Make it World->Eye
+
+	D = 0;
+	
+	float3 LColor;
+	float3 LDir;
+
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		GetLightData(g_cLightInfo, i, WPos, LColor, LDir);
+
+		//float3 H = normalize(ViewDir + LDir);
+		float3 H = normalize(LDir);
+		float NdotH = saturate(dot(WNormal, H));
+		
+		D = D_GGX(Roughness, NdotH);
+	}
+	
+}
+
+// Semantic structures
+struct PS_INPUT
+{
+	float2 vUV			:	TEXCOORD0;
+	float3 vWNormal			:	TEXCOORD1;
+	float3 vWorldPos			:	TEXCOORD2;
+	float4 vTexCoord_3			:	TEXCOORD3;
+	float3 vTanS			:	TEXCOORD5;
+	float3 vTanT			:	TEXCOORD6;
+	float3 vEye2World			:	TEXCOORD7;
+};
+
+struct PS_OUTPUT
+{
+	float4 color				:	COLOR0;
+};
+
+// Entry point
+PS_OUTPUT main( const PS_INPUT In )
+{
+	PS_OUTPUT Out;
+	
+	float2 uvTiled = g_cData_tiling * In.vUV;
+	float3x3 tangentSpace = { In.vTanS, In.vTanT, In.vWNormal };
+	
+	//float3 world2Eye = In.vEye2World * float( -1.000000 );
+	float4 baseTex = tex2D( smBaseTex, uvTiled );
+	
+	float3 normal = normalize((tex2D( smNormalMap, uvTiled ).rgb * 2.0f) - 1.0f);
+	normal = mul( normal, tangentSpace);
+	normal = normalize( normal );
+	
+	float roughness = 1.0f - tex2D( smGloss, uvTiled ).r;
+	float reflTex = tex2D( smRefl, uvTiled ).r;
+	//float4 ao = tex2D( smAO, uvTiled ).rgba;
+	
+	
+	float3 diffuse = PixelShaderDoLighting( In.vWorldPos, normal, float3(0,0,0), false, true, In.vTexCoord_3, g_cAmbientCube, NUM_LIGHTS, g_cLightInfo, false, false, 1.0f );
+			
+	float visTerm = (float)0;
+	SpecularVisTerm( In.vWorldPos, normal, In.vEye2World, roughness, visTerm );
+	
+	float distTerm = (float)0;
+	DistTerm( In.vWorldPos, normal, In.vEye2World, roughness, distTerm );
+	
+
+	float specular = visTerm * distTerm;
+	
+	float3 reflections = texCUBE( smCubemap, reflect( In.vEye2World, normal ) ).rgb;
+	reflections = reflections * ENV_MAP_SCALE;
+	reflections = reflTex * reflections;
+
+	float light = diffuse + (specular * reflections);
+	Out.color = float4( baseTex.rgb * light, baseTex.a );
+	return Out;
+}

@@ -1,9 +1,14 @@
-
+#ifndef _SCRIPT_MANAGER_H
+#define _SCRIPT_MANAGER_H
 #pragma once
 
 #include "cbase.h"
 
+#include <functional>
+
 #include "IScriptingLanguage.h"
+
+//#ifdef SCRIPTO_EXPORTS
 
 template class DLL_API CUtlMemory < IScriptingLanguage* >;
 template class DLL_API CUtlMemory < const char* >;
@@ -11,6 +16,7 @@ template class DLL_API CUtlMemory < const char* >;
 template class DLL_API CUtlVector < IScriptingLanguage* >;
 template class DLL_API CUtlVector < const char* >;
 
+//#endif
 
 class DLL_API CScriptManager
 {
@@ -18,6 +24,7 @@ private:
 	
 	CUtlVector<IScriptingLanguage*> languages;
 	CUtlVector<const char*> hooks;
+	
 public:
 	CScriptManager();
 	~CScriptManager() {};
@@ -27,7 +34,7 @@ public:
 	int AddLanguage(IScriptingLanguage* language);
 	
 	// Gets the IScriptingLanguage at ID for direct use
-	IScriptingLanguage* GetLanguage(int id) { return languages[id]; };
+	IScriptingLanguage* GetLanguage(int id) { return languages[id]; }
 
 	int CountLanguages() { return languages.Count(); }
 
@@ -52,9 +59,11 @@ public:
 	//	C++ functions that can be called from scripts
 	///////////////////////////////////////////////////////////
 
-	//template<typename F>
-	// void AddBind(const char* name, F func);
+	//template<typename R, typename... Args>
+	//void AddBind(const char* name, void* func);
 	
 	// CUtlVector<const char*> GetBinds();
 	
 };
+
+#endif

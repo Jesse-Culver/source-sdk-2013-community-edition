@@ -19,6 +19,7 @@
 
 static ConVar mat_slopescaledepthbias_shadowmap( "mat_slopescaledepthbias_shadowmap", "16", FCVAR_CHEAT );
 static ConVar mat_depthbias_shadowmap(	"mat_depthbias_shadowmap", "0.00001", FCVAR_CHEAT  );
+static ConVar mat_shadow_filter("mat_shadow_filter", "1", FCVAR_CHEAT);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -207,6 +208,8 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 	state.m_bEnableShadows = m_bEnableShadows;
 	state.m_pSpotlightTexture = materials->FindTexture( m_SpotlightTextureName, TEXTURE_GROUP_OTHER, false );
 	state.m_nSpotlightTextureFrame = m_nSpotlightTextureFrame;
+	// TODO: this doesn't seem to work all the time
+	state.m_flShadowFilterSize = mat_shadow_filter.GetFloat();
 
 	state.m_nShadowQuality = m_nShadowQuality; // Allow entity to affect shadow quality
 

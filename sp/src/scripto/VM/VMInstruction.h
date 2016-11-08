@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 
 typedef uint32_t Reg;
@@ -6,13 +8,15 @@ typedef uint32_t Reg;
 typedef uint32_t Instruction;
 
 // The "structure" of an instruction is as follows:
-//		OPCODE	- 6  bits
+//
+//		OPCODE	- 6  bits			(0 to 63)
 //		ARGS	- 26 bits
-//			A	- 8 bits
-//			B	- 9 bits
-//			C	- 9 bits
-//			BC	- 18 bits
-//			sBC	- signed BC
+//			A	- 8 bits			(0 to 255)
+//			B	- 9 bits			(-127 to 127)
+//			C	- 9 bits			(-127 to 127)
+//			BC	- 18 bits			(0 to 262,143)
+//			sBC	- signed BC			(-131,071 to 131,071)
+//
 // B and C are signed to allow them to refer to registers or constants
 
 // Op-Code
@@ -33,10 +37,15 @@ typedef uint32_t Instruction;
 
 // BC
 #define SIZE_BC	(SIZE_B + SIZE_C)
-#define POS(BC)	(POS_B)
+#define POS_BC	(POS_B)
 
-
-#define GET_OP(x) x
+// TODO
+#define GET_OP(i)	i
+#define GET_A(i)	i
+#define GET_B(i)	i
+#define GET_C(i)	i
+#define GET_BC(i)	i
+#define GET_sBC(i)	i
 
 ///////////////////////////////////////////////////////////////////////
 
@@ -59,22 +68,28 @@ enum OpCode {
 name			args	description
 ************************************************************/
 OP_MOVE,//		A B		R(A) = R(B)
-OP_LOAD,//		A B C	R(A) = C(BC)
+
+OP_LOAD,//		A BC	R(A) = C(BC)
+
+OP_GET,//		A B C	R(A) = RC(B)[RC(C)]
+OP_SET,//		A B C	R(A)[RC(B)] = RC(C)
 
 
+// Delete B registers from A (from R(A) to R(A+B))
 OP_DEL,//		A B		R(A), R(A+1), ..., R(A+B) = NULL
 
-OP_JUMP,//		sBC		PC += sBC	
+OP_JUMP,//		sBC		PC += sBC
+OP_RETURN,//	A B		return R(A), ..., R(A+B)
 
 OP_EQ,//		A B C	if ((RC(B) == RC(C)) != A) PC++	
 OP_LT,//		A B C	if ((RC(B) <  RC(C)) != A) PC++
 OP_LE,//		A B C	if ((RC(B) <= RC(C)) != A) PC++
 
-OP_ADD,/*		A B C	R(A) = RC(B) + RC(x)	*/
-OP_SUB,/*		A B C	R(A) = RC(B) - RC(x)	*/
-OP_MUL,/*		A B C	R(A) = RC(B) * RC(x)	*/
-OP_DIV,/*		A B C	R(A) = RC(B) / RC(x)	*/
-OP_MOD,/*		A B C	R(A) = RC(B) % RC(x)	*/
-OP_POW /*		A B C	R(A) = RC(B) ^ RC(x)	*/
+OP_ADD,//		A B C	R(A) = RC(B) + RC(x)
+OP_SUB,//		A B C	R(A) = RC(B) - RC(x)
+OP_MUL,//		A B C	R(A) = RC(B) * RC(x)
+OP_DIV,//		A B C	R(A) = RC(B) / RC(x)
+OP_MOD,//		A B C	R(A) = RC(B) % RC(x)
+OP_POW //		A B C	R(A) = RC(B) ^ RC(x)
 
 };

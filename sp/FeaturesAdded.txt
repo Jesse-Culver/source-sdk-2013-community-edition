@@ -32,3 +32,4 @@ Author(s): Marnamai
 Files touched: c_detailobjectsystem.cpp
 Notes: Enabled shape support / Fixed aspect ratio for detail.vbsp / Allowed vertex lit models
 
+

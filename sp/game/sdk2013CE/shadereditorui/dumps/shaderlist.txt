@@ -1,3 +1,4 @@
 "shaderlist"
 {
+	"shader_000"		"pbr"
 }

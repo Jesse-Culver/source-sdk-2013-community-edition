@@ -1,0 +1,19 @@
+VMT
+{
+    toolwindow
+    {
+        bounds "0.0000000000 0.0259259255 0.5000000261 0.9740740568"
+        windows
+        {
+            panel "properties"
+        }
+    }
+    toolwindow
+    {
+        bounds "0.5000000261 0.4740740657 0.5000000261 0.4999999912"
+        windows
+        {
+            panel "vmtpanel"
+        }
+    }
+}

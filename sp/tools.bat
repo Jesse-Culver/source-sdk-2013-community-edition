@@ -22,7 +22,7 @@ if not exist "%steampath%\steam.exe" (
 )
 
 echo Running a shader editor
-@start /D "%steampath%\steamapps\common\Source SDK Base 2013 Singleplayer" hl2.exe -dev -console -novid -game "%CD%\game\sdk2013CE" -tools -window -height 720
+@start /D "%steampath%\steamapps\common\Source SDK Base 2013 Singleplayer" hl2.exe -dev -console -novid -game "%CD%\game\sdk2013CE" -tools -window -nop4
 
 if %ERRORLEVEL% NEQ 0 goto error
 goto success

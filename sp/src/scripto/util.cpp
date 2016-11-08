@@ -1,6 +1,8 @@
 #include "cbase.h"
 #include "util.h"
 
+#include <cstdio>
+
 void ScriptLog(const char* msg, ...)
 {
 	char buf[256];
@@ -12,8 +14,7 @@ void ScriptLog(const char* msg, ...)
 
 	va_end(args);
 
-	//Msg("[Script] %s\n", buf);
-	ConColorMsg(COLOR_CYAN, "[Script] %s\n", buf);
+	_Msg(COLOR_CYAN, "[Script] %s\n", buf);
 }
 
 void ScriptError(const char* msg, ...)
@@ -27,6 +28,5 @@ void ScriptError(const char* msg, ...)
 
 	va_end(args);
 
-	//Msg("[Script] Error: %s\n", buf);
-	ConColorMsg(COLOR_RED, "[Script] %s\n", buf);
+	_Msg(COLOR_RED, "[Script] %s\n", buf);
 }

@@ -9,7 +9,10 @@ private:
 
 	lua_State* L;
 public:
-	CLuaLanguage()	{};
+	CLuaLanguage()
+	{
+		ScriptLog("Added Language: Lua");
+	};
 	~CLuaLanguage()	{};
 
 	void Initialize();

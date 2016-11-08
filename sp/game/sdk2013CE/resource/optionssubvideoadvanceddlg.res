@@ -1274,7 +1274,7 @@
 		"visible"		"1"
 		"enabled"		"1"
 		"tabPosition"		"0"
-		"labelText"		"#GameUI_HDR"
+		"labelText"		"CSM"
 		"textAlignment"		"west"
 		"associate"		"HDR"
 		"dulltext"		"0"

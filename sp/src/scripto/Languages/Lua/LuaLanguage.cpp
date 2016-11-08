@@ -39,7 +39,7 @@ void CLuaLanguage::Initialize()
 {
 	L = luaL_newstate();
 	lua_atpanic(L, _lua_error);
-
+	
 	for (int i = 0; i < sizeof(libs); i++)
 	{
 		// FIXME: This crahses the game

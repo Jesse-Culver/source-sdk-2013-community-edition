@@ -1,8 +1,8 @@
-#base "SourceSchemeBase.res"
+#base "SourceSchemeNewBase.res"
 
 Scheme
 {
-    //////////////////////// COLORS ///////////////////////////
+    //////////////////// COLORS ///////////////////////////
 	// color details
 	// this is a list of all the colors used by the scheme
 	Colors
@@ -43,7 +43,7 @@ Scheme
 	BaseSettings
 	{
 		// scheme-specific colors
-		Border.Bright					"TFTanLightDark"	// the lit side of a control
+		Border.Bright					"TFTanLightDark"		// the lit side of a control
 		Border.Dark						"TFTanLightDark"		// the dark/unlit side of a control
 		Border.Selection				"BorderSelection"			// the additional border color for displaying the default/selected button
 
@@ -56,9 +56,9 @@ Scheme
 		Button.FocusBorderColor			"TransparentBlack"
 		
 		CheckButton.TextColor			"TFTextBright"
-		CheckButton.SelectedTextColor		"TFTextBright"
+		CheckButton.SelectedTextColor	"TFTextBright"
 		CheckButton.BgColor				"ListBG"
-		CheckButton.HighlightFgColor		"TFTextMedium"
+		CheckButton.HighlightFgColor	"TFTextMedium"
 		CheckButton.ArmedBgColor		"Blank"
 		CheckButton.DepressedBgColor		"Blank"
 		CheckButton.Border1  			"Border.Dark" 		// the left checkbutton border
@@ -82,7 +82,7 @@ Scheme
 		FrameGrip.Color1				"TFTanMedium"
 		FrameGrip.Color2				"TFDarkBrown"
 		FrameTitleButton.FgColor		"TFTanBright"
-		FrameTitleBar.Font			"DefaultLarge"		[$WIN32]
+		FrameTitleBar.Font				"DefaultLarge"		[$WIN32]
 		FrameTitleBar.TextColor			"TFTanBright"
 		FrameTitleBar.DisabledTextColor	"TFTanLight"
 		

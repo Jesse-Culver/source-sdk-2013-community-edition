@@ -1,9 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//===========================================================================//
+
+#pragma region Includes
+
 #include "cbase.h"
 #include <crtmemdebug.h>
 #include "vgui_int.h"
@@ -173,8 +171,14 @@ extern vgui::IInputInternal *g_InputInternal;
 #include "scripto/scripto.h"
 #include "scripto/lua.h"
 
+#include "toolframework/itoolframework.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+#pragma endregion
+
+#pragma region Globals
 
 extern IClientMode *GetClientModeNormal();
 
@@ -349,9 +353,9 @@ static ConVar *g_pcv_ThreadMode = NULL;
 
 CScriptManager g_scriptManager;
 
-//-----------------------------------------------------------------------------
+#pragma endregion
+
 // Purpose: interface for gameui to modify voice bans
-//-----------------------------------------------------------------------------
 class CGameClientExports : public IGameClientExports
 {
 public:
@@ -475,10 +479,7 @@ private:
 
 EXPOSE_SINGLE_INTERFACE( CClientDLLSharedAppSystems, IClientDLLSharedAppSystems, CLIENT_DLL_SHARED_APPSYSTEMS );
 
-
-//-----------------------------------------------------------------------------
 // Helper interface for voice.
-//-----------------------------------------------------------------------------
 class CHLVoiceStatusHelper : public IVoiceStatusHelper
 {
 public:
@@ -498,10 +499,11 @@ public:
 };
 static CHLVoiceStatusHelper g_VoiceStatusHelper;
 
+#pragma region Bones
+
 //-----------------------------------------------------------------------------
 // Code to display which entities are having their bones setup each frame.
 //-----------------------------------------------------------------------------
-
 ConVar cl_ShowBoneSetupEnts( "cl_ShowBoneSetupEnts", "0", 0, "Show which entities are having their bones setup each frame." );
 
 class CBoneSetupEnt
@@ -593,6 +595,10 @@ void DisplayBoneSetupEnts()
 	g_BoneSetupEnts.RemoveAll();
 #endif
 }
+
+#pragma endregion
+
+#pragma region CHLClient Definition
 
 //-----------------------------------------------------------------------------
 // Purpose: engine to client .dll interface
@@ -741,12 +747,14 @@ private:
 	CUtlVector< IMaterial * > m_CachedMaterials;
 };
 
-
 CHLClient gHLClient;
 IBaseClientDLL *clientdll = &gHLClient;
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CHLClient, IBaseClientDLL, CLIENT_DLL_INTERFACE_VERSION, gHLClient );
 
+#pragma endregion
+
+#pragma region Util Functions
 
 //-----------------------------------------------------------------------------
 // Precaches a material
@@ -787,8 +795,6 @@ const char *GetMaterialNameFromIndex( int nIndex )
 		return NULL;
 	}
 }
-
-
 //-----------------------------------------------------------------------------
 // Precaches a particle system
 //-----------------------------------------------------------------------------
@@ -797,7 +803,6 @@ void PrecacheParticleSystem( const char *pParticleSystemName )
 	g_pStringTableParticleEffectNames->AddString( false, pParticleSystemName );
 	g_pParticleSystemMgr->PrecacheParticleSystem( pParticleSystemName );
 }
-
 
 //-----------------------------------------------------------------------------
 // Converts a previously precached particle system into an index
@@ -838,9 +843,9 @@ bool IsEngineThreaded()
 	return false;
 }
 
-//-----------------------------------------------------------------------------
-// Constructor
-//-----------------------------------------------------------------------------
+#pragma endregion
+
+#pragma region CHLClient Core
 
 CHLClient::CHLClient() 
 {
@@ -854,6 +859,7 @@ extern IGameSystem *ViewportClientSystem();
 
 //-----------------------------------------------------------------------------
 ISourceVirtualReality *g_pSourceVR = NULL;
+
 
 // Purpose: Called when the DLL is first loaded.
 // Input  : engineFactory - 
@@ -879,6 +885,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #ifndef NO_STEAM
 	ClientSteamContext().Activate();
 #endif
+
+#pragma region Interfaces
 
 	// We aren't happy unless we get all of our interfaces.
 	// please don't collapse this into one monolithic boolean expression (impossible to debug)
@@ -956,6 +964,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	// it's ok if this is NULL. That just means the sourcevr.dll wasn't found
 	g_pSourceVR = (ISourceVirtualReality *)appSystemFactory(SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION, NULL);
 
+#pragma endregion
+
 	factorylist_t factories;
 	factories.appSystemFactory = appSystemFactory;
 	factories.physicsFactory = physicsFactory;
@@ -1016,9 +1026,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	IGameSystem::Add( PerfVisualBenchmark() );
 	IGameSystem::Add( MumbleSystem() );
 
-	// Source CE (see server/gameinterface.cpp)
+	// Source CE Scripting Hooks
 	
-	g_scriptManager.AddLanguage(new CLuaLanguage());
+	//g_scriptManager.AddLanguage(new CLuaLanguage());
 
 	/*g_scriptManager.AddHook("DLLInit");
 	g_scriptManager.AddHook("PostInit");
@@ -1033,12 +1043,12 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	g_scriptManager.AddHook("LevelShutdown");
 	g_scriptManager.AddHook("DLLShutdown");*/
 
-		#if defined( TF_CLIENT_DLL )
-	IGameSystem::Add( CustomTextureToolCacheGameSystem() );
-	IGameSystem::Add( TFSharedContentManager() );
-	#endif
+	
 
 #if defined( TF_CLIENT_DLL )
+	IGameSystem::Add( CustomTextureToolCacheGameSystem() );
+	IGameSystem::Add( TFSharedContentManager() );
+
 	if ( g_AbuseReportMgr != NULL )
 	{
 		IGameSystem::Add( g_AbuseReportMgr );
@@ -1049,38 +1059,26 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	IGameSystem::Add( GetPredictionCopyTester() );
 #endif
 
+	// Big List of Init Functions
+
 	modemanager->Init( );
-
 	g_pClientMode->InitViewport();
-
 	gHUD.Init();
-
 	g_pClientMode->Init();
-
-	if ( !IGameSystem::InitAllSystems() )
-		return false;
-
+	if ( !IGameSystem::InitAllSystems() ) return false;
 	g_pClientMode->Enable();
 
 	if ( !view )
-	{
 		view = ( IViewRender * )&g_DefaultViewRender;
-	}
 
 	view->Init();
 	vieweffects->Init();
-
 	C_BaseTempEntity::PrecacheTempEnts();
-
 	input->Init_All();
-
 	VGui_CreateGlobalPanels();
-
 	InitSmokeFogOverlay();
-
 	// Register user messages..
 	CUserMessageRegister::RegisterAll();
-
 	ClientVoiceMgr_Init();
 
 	// Embed voice status icons inside chat element
@@ -1182,10 +1180,10 @@ void CHLClient::PostInit()
 //-----------------------------------------------------------------------------
 void CHLClient::Shutdown( void )
 {
+	// Big List of Shutdown Functions
+
     if (g_pAchievementsAndStatsInterface)
-    {
         g_pAchievementsAndStatsInterface->ReleasePanel();
-    }
 
 #ifdef SIXENSE
 	g_pSixenseInput->Shutdown();
@@ -1234,7 +1232,7 @@ void CHLClient::Shutdown( void )
 #endif
 	
 	// This call disconnects the VGui libraries which we rely on later in the shutdown path, so don't do it
-//	DisconnectTier3Libraries( );
+	//	DisconnectTier3Libraries( );
 	DisconnectTier2Libraries( );
 	ConVar_Unregister();
 	DisconnectTier1Libraries( );
@@ -1247,6 +1245,9 @@ void CHLClient::Shutdown( void )
 #endif
 }
 
+#pragma endregion
+
+#pragma region HUD
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1258,7 +1259,6 @@ void CHLClient::Shutdown( void )
 int CHLClient::HudVidInit( void )
 {
 	gHUD.VidInit();
-
 	GetClientVoiceMgr()->VidInit();
 
 	return 1;
@@ -1348,46 +1348,21 @@ bool CHLClient::ShouldDrawDropdownConsole()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : ClientClass
-//-----------------------------------------------------------------------------
-ClientClass *CHLClient::GetAllClasses( void )
-{
-	return g_pClientClassHead;
-}
+#pragma endregion
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CHLClient::IN_ActivateMouse( void )
-{
-	input->ActivateMouse();
-}
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CHLClient::IN_DeactivateMouse( void )
-{
-	input->DeactivateMouse();
-}
+ClientClass *CHLClient::GetAllClasses(void) {return g_pClientClassHead;}
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CHLClient::IN_Accumulate ( void )
-{
-	input->AccumulateMouse();
-}
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CHLClient::IN_ClearStates ( void )
-{
-	input->ClearStates();
-}
+
+#pragma region Input
+
+// Input Methods
+
+void CHLClient::IN_ActivateMouse(void) {input->ActivateMouse();}
+void CHLClient::IN_DeactivateMouse(void) {input->DeactivateMouse();}
+void CHLClient::IN_Accumulate (void) {input->AccumulateMouse();}
+void CHLClient::IN_ClearStates ( void ) {input->ClearStates();}
 
 //-----------------------------------------------------------------------------
 // Purpose: Engine can query for particular keys
@@ -1455,6 +1430,11 @@ void CHLClient::IN_SetSampleTime( float frametime )
 	g_pSixenseInput->ResetFrameTime( frametime );
 #endif
 }
+
+#pragma endregion
+
+#pragma region CHLClient Misc
+
 //-----------------------------------------------------------------------------
 // Purpose: Fills in usercmd_s structure based on current view angles and key/controller inputs
 // Input  : frametime - timestamp for last frame
@@ -1584,6 +1564,8 @@ void CHLClient::View_Fade( ScreenFade_t *pSF )
 	if ( pSF != NULL )
 		vieweffects->Fade( *pSF );
 }
+
+#pragma region Level
 
 //-----------------------------------------------------------------------------
 // Purpose: Per level init
@@ -1761,6 +1743,7 @@ void CHLClient::LevelShutdown( void )
 #endif
 }
 
+#pragma endregion
 
 //-----------------------------------------------------------------------------
 // Purpose: Engine received crosshair offset ( autoaim )
@@ -2117,6 +2100,9 @@ void UpdatePVSNotifiers()
 	}
 }
 
+#pragma endregion
+
+#pragma region Rendering & Frame
 
 void OnRenderStart()
 {
@@ -2249,6 +2235,7 @@ void OnRenderEnd()
 }
 
 
+#pragma endregion
 
 void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 {
@@ -2330,6 +2317,8 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 	}
 }
 
+#pragma region Save/Load
+
 CSaveRestoreData *SaveInit( int size );
 
 // Save/restore system hooks
@@ -2410,6 +2399,10 @@ void CHLClient::WriteSaveGameScreenshot( const char *pFilename )
 	view->WriteSaveGameScreenshot( pFilename );
 }
 
+#pragma endregion
+
+#pragma region Demos & Captions
+
 // Given a list of "S(wavname) S(wavname2)" tokens, look up the localized text and emit
 //  the appropriate close caption if running with closecaption = 1
 void CHLClient::EmitSentenceCloseCaption( char const *tokenstream )
@@ -2488,15 +2481,10 @@ void CHLClient::OnDemoPlaybackStop()
 #endif
 }
 
-int CHLClient::GetScreenWidth()
-{
-	return ScreenWidth();
-}
+#pragma endregion
 
-int CHLClient::GetScreenHeight()
-{
-	return ScreenHeight();
-}
+int CHLClient::GetScreenWidth() {return ScreenWidth();}
+int CHLClient::GetScreenHeight() {return ScreenHeight();}
 
 // NEW INTERFACES
 // save game screenshot writing
@@ -2515,15 +2503,12 @@ void CHLClient::RenderView( const CViewSetup &setup, int nClearFlags, int whatTo
 
 void ReloadSoundEntriesInList( IFileList *pFilesToReload );
 
-//-----------------------------------------------------------------------------
 // For sv_pure mode. The filesystem figures out which files the client needs to reload to be "pure" ala the server's preferences.
-//-----------------------------------------------------------------------------
 void CHLClient::ReloadFilesInList( IFileList *pFilesToReload )
 {
 	ReloadParticleEffectsInList( pFilesToReload );
 	ReloadSoundEntriesInList( pFilesToReload );
 }
-
 bool CHLClient::HandleUiToggle()
 {
 #if defined( REPLAY_ENABLED )
@@ -2543,10 +2528,7 @@ bool CHLClient::HandleUiToggle()
 #endif
 }
 
-bool CHLClient::ShouldAllowConsole()
-{
-	return true;
-}
+bool CHLClient::ShouldAllowConsole() { return true; }
 
 CRenamedRecvTableInfo *CHLClient::GetRenamedRecvTableInfos()
 {

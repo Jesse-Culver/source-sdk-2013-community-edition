@@ -10,25 +10,24 @@
 #define DLL_API __declspec(dllimport)
 #endif
 
-#ifndef SOURCE_ENGINE
-#define SOURCE_ENGINE
-#endif
-
 // standard libs
 #include <cstdarg>
 
-#ifdef SOURCE_ENGINE
-
-//tier0
-#include <tier0/dbg.h>
 // tier1
-#include <tier1/utlvector.h>
 #include <Color.h>
 
+
+#ifdef SOURCE_ENGINE
+
+#include <tier1/utlvector.h>
+
 #else
-// Non-source implementations
+
+// TODO
 
 #endif
+
+void _Msg(const Color& clr, const char* pMsg, char* buffer);
 
 #include "util.h"
 

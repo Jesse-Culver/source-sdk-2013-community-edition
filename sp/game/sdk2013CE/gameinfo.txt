@@ -34,22 +34,22 @@
 			// as the first "mod" search path (after any user customizations).  This is also the one
 			// that's used when writing to the "mod" path.
 			game+mod+mod_write+default_write_path		|gameinfo_path|.
-			gamebin				|gameinfo_path|bin
+			gamebin										|gameinfo_path|bin
 
 			// We search VPK files before ordinary folders, because most files will be found in
 			// VPK and we can avoid making thousands of file system calls to attempt to open files
 			// in folders where they don't exist.  (Searching a VPK is much faster than making an operating
 			// system call.)
 			//NOTE: Order does matter, things loaded first override things after
-			game_lv				hl2/hl2_lv.vpk
-			game+mod			ep2/ep2_english.vpk
+			//game_lv			hl2/hl2_lv.vpk
+			//game+mod			ep2/ep2_english.vpk
 			game+mod			ep2/ep2_pak.vpk
-			game				|all_source_engine_paths|episodic/ep1_english.vpk
+			//game				|all_source_engine_paths|episodic/ep1_english.vpk
 			game				|all_source_engine_paths|episodic/ep1_pak.vpk
-			game				|all_source_engine_paths|hl2/hl2_english.vpk
+			//game				|all_source_engine_paths|hl2/hl2_english.vpk
 			game				|all_source_engine_paths|hl2/hl2_pak.vpk
 			game				|all_source_engine_paths|hl2/hl2_textures.vpk
-			game				|all_source_engine_paths|hl2/hl2_sound_vo_english.vpk
+			//game				|all_source_engine_paths|hl2/hl2_sound_vo_english.vpk
 			game				|all_source_engine_paths|hl2/hl2_sound_misc.vpk
 			game				|all_source_engine_paths|hl2/hl2_misc.vpk
 			platform			|all_source_engine_paths|platform/platform_misc.vpk

@@ -103,7 +103,7 @@ void DumpEntityFactories_f()
 	{
 		for ( int i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
 		{
-			Warning( "%s\n", dict->m_Factories.GetElementName( i ) );
+			Log( "%s\n", dict->m_Factories.GetElementName( i ) );
 		}
 	}
 }

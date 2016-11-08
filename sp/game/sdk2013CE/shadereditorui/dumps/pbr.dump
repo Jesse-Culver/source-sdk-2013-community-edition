@@ -141,7 +141,7 @@
 		}
 		"texsamp_0"
 		{
-			"sz_fallback"		"Dev\bump"
+			"sz_fallback"		"white"
 			"i_sampidx"		"0"
 			"i_texmode"		"1"
 			"i_cubemap"		"0"
@@ -166,7 +166,7 @@
 		}
 		"texsamp_3"
 		{
-			"sz_param"		"ambientocclusion"
+			"sz_param"		"refl"
 			"sz_fallback"		"white"
 			"i_sampidx"		"3"
 			"i_texmode"		"0"
@@ -175,7 +175,7 @@
 		}
 		"texsamp_4"
 		{
-			"sz_param"		"specular"
+			"sz_param"		"ambientocclusion"
 			"sz_fallback"		"white"
 			"i_sampidx"		"4"
 			"i_texmode"		"0"
@@ -184,11 +184,10 @@
 		}
 		"texsamp_5"
 		{
-			"sz_param"		"detail"
-			"sz_fallback"		"Dev\bump"
+			"sz_fallback"		"cable\black"
 			"i_sampidx"		"5"
-			"i_texmode"		"0"
-			"i_cubemap"		"0"
+			"i_texmode"		"6"
+			"i_cubemap"		"1"
 			"i_srgb"		"0"
 		}
 		"i_numdcombos"		"5"

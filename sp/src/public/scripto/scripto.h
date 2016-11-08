@@ -2,6 +2,7 @@
 #define _SCRIPTO_H
 #define SOURCE_ENGINE
 
+#pragma once
+
 #include "..\..\scripto\scripto.h"
-#include "..\..\scripto\SourceSDK\srcsdk.h"
 #endif

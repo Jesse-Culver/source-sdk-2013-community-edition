@@ -40,16 +40,6 @@ float Vis_SmithJointApprox( float Roughness, float NoV, float NoL )
 	return 0.5 * (1 / (Vis_SmithV + Vis_SmithL) );
 }
 
-float Vis_Alt(float Roughness, float NoV, float NoL)
-{
-	float a = Roughness * Roughness;
-	float a2 = a*a;
-
-	float Vis_SmithV = NoV + sqrt( NoV * (NoV - NoV * a2) + a2 );
-	float Vis_SmithL = NoL + sqrt( NoL * (NoL - NoL * a2) + a2 );
-	return 1 / ( Vis_SmithV * Vis_SmithL );
-}
-
 const static float PI = 3.1415926535897932f;
 
 float D_GGX( float Roughness, float NoH )
@@ -60,21 +50,6 @@ float D_GGX( float Roughness, float NoH )
 	return a2 / ( PI*d*d );					// 4 mul, 1 rcp
 }
 
-float D_Blinn(float Roughness, float NoH)
-{
-	float a = Roughness * Roughness;
-	float a2 = a * a;
-	float n = 2 / a2 - 2;
-	return (n+2) / (2*PI) * pow( NoH, n );
-}
-
-float D_Beckmann( float Roughness, float NoH )
-{
-	float a = Roughness * Roughness;
-	float a2 = a * a;
-	float NoH2 = NoH * NoH;
-	return exp( (NoH2 - 1) / (a2 * NoH2) ) / ( PI * a2 * NoH2 * NoH2 );
-}
 
 
 // User code - function bodies
@@ -92,10 +67,9 @@ void SpecularVisTerm( in float3 WPos, in float3 WNormal, in float3 EyeToWorld, i
 		GetLightData(g_cLightInfo, i, WPos, LColor, LDir);
 
 		float NdotL = saturate(dot(WNormal, LDir * -1));
-		float NdotV = saturate(abs(dot(WNormal, ViewDir))+1e-5);
-		//float NdotV = saturate(dot(WNormal, ViewDir));
+		float NdotV = saturate(abs( dot(WNormal, ViewDir) ) + 1e-5 );
 		
-		Vis = Vis_Alt(Roughness, NdotV, NdotL);
+		Vis = Vis_SmithJointApprox(Roughness, NdotV, NdotL);
 	}
 	
 }
@@ -112,8 +86,9 @@ void DistTerm( in float3 WPos, in float3 WNormal, in float3 EyeToWorld, in float
 	{
 		GetLightData(g_cLightInfo, i, WPos, LColor, LDir);
 
-		float3 H = normalize(ViewDir + LDir);
-		float NdotH = (dot(WNormal, H));
+		//float3 H = normalize(ViewDir + LDir);
+		float3 H = normalize(LDir);
+		float NdotH = saturate(dot(WNormal, H));
 		
 		D = D_GGX(Roughness, NdotH);
 	}
@@ -146,37 +121,37 @@ PS_OUTPUT main( const PS_INPUT In )
 				In.vTexCoord_6,
 				In.vTexCoord_1 };
 	float3 _var2 = In.vTexCoord_7 * float( -1.000000 );
-	float4 _texLookup_18 = tex2D( _Sampler_00, _var0 );
-	float3 _var3 = _texLookup_18.rgb;
-	float _var4 = _texLookup_18.a;
-	float2 _var5 = float( 7.500000 ) * _var0;
-	float3 _var6 = tex2D( _Sampler_01, _var0 ).rgb;
-	float _var7 = tex2D( _Sampler_02, _var0 ).r;
-	float4 _var8 = tex2D( _Sampler_03, _var0 ).rgba;
-	float4 _var9 = tex2D( _Sampler_04, _var0 ).rgba;
-	float3 _var10 = tex2D( _Sampler_05, _var5 ).rgb;
-	_var6 = _var6 * float( 2.000000 );
-	_var7 = 1.0f - _var7;
-	_var10 = _var10 * float( 2.000000 );
-	_var6 = _var6 - float( 1.000000 );
-	_var3 = _var3 * _var10;
-	_var6 = normalize( _var6 );
-	float3 _var11 = _var3;
-	_var6 = mul( _var6, _var1 );
-	_var6 = normalize( _var6 );
-	float3 _var12 = PixelShaderDoLighting( In.vTexCoord_2, _var6, float3(0,0,0),
+	float4 _texLookup_16 = tex2D( _Sampler_00, _var0 );
+	float3 _var3 = _texLookup_16.rgb;
+	float _var4 = _texLookup_16.a;
+	float3 _var5 = tex2D( _Sampler_01, _var0 ).rgb;
+	float _var6 = tex2D( _Sampler_02, _var0 ).r;
+	float _var7 = tex2D( _Sampler_03, _var0 ).r;
+	float4 _var8 = tex2D( _Sampler_04, _var0 ).rgba;
+	_var5 = _var5 * float( 2.000000 );
+	_var6 = 1.0f - _var6;
+	_var5 = _var5 - float( 1.000000 );
+	_var6 = _var6 * float( 1.000000 );
+	_var5 = normalize( _var5 );
+	_var5 = mul( _var5, _var1 );
+	_var5 = normalize( _var5 );
+	float3 _var9 = PixelShaderDoLighting( In.vTexCoord_2, _var5, float3(0,0,0),
 			false, true, In.vTexCoord_3,
 			g_cAmbientCube, NUM_LIGHTS, g_cLightInfo,
 			false, false, 1.0f );
-	float _var13 = (float)0;
-	SpecularVisTerm( In.vTexCoord_2, _var6, In.vTexCoord_7, float( 1.000000 ), _var13 );
-	float _var14 = (float)0;
-	DistTerm( In.vTexCoord_2, _var6, In.vTexCoord_7, float( 1.000000 ), _var14 );
-	_var13 = _var13 * _var14;
-	_var13 = _var13 * float( 1.000000 );
-	_var12 = _var12 + _var13;
-	_var11 = _var11 * _var12;
-	float4 _var15 = float4( _var11, _var4 );
-	Out.vColor_0 = _var15;
+	float _var10 = (float)0;
+	SpecularVisTerm( In.vTexCoord_2, _var5, In.vTexCoord_7, _var6, _var10 );
+	float _var11 = (float)0;
+	DistTerm( In.vTexCoord_2, _var5, In.vTexCoord_7, _var6, _var11 );
+	float3 _var12 = reflect( In.vTexCoord_7, _var5 );
+	_var10 = _var10 * _var11;
+	float3 _var13 = texCUBE( _Sampler_05, _var12 ).rgb;
+	_var13 = _var13 * ENV_MAP_SCALE;
+	_var13 = _var7 * _var13;
+	_var13 = _var10 * _var13;
+	_var9 = _var9 + _var13;
+	_var3 = _var3 * _var9;
+	float4 _var14 = float4( _var3, _var4 );
+	Out.vColor_0 = _var14;
 	return Out;
 }

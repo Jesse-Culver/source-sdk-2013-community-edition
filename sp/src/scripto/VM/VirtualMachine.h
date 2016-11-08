@@ -1,56 +1,52 @@
-// Scripto Virtual Machine CONCEPT
+﻿// Scripto Virtual Machine CONCEPT
 // Based off of Lua VM
 
+#pragma once
+
+#include "../IScriptingLanguage.h"
+
 #include "VMInstruction.h"
-#include "VMState.h"
 #include "VMTypes.h"
-
-// Local (per-thread) state
-struct VMState
-{
-	const Instruction* PC;
-};
+#include "VMState.h"
 
 
-class CVirtualMachine
+class DLL_API CVirtualMachine : public IScriptingLanguage
 {
 private:
-	const Instruction* PC;
+	
 public:
-	CVirtualMachine()
+	VMGlobalState G;
+
+	CVirtualMachine() 
+	{
+		VM_CLASS_CONSTRUCTOR(CVirtualMachine);
+	}
+
+	~CVirtualMachine()
+	{
+		VM_CLASS_DESTRUCTOR(CVirtualMachine);
+	}
+	
+	void Initialize()
+	{
+		G.InitRegistry();
+	}
+
+	void Terminate()
 	{
 		
 	}
 
-	void Init()
-	{
+	void AddHook(const char* name) {}
+	bool CallHook(const char* name, ...) {return true;}
 
+	size_t GetMemoryUsage()
+	{
+		return 0;
 	}
 
 	// Execute from PC to next return
-	void Exexcute(VMState* state)
-	{
-		for (;;)
-		{
-			state->PC++;
-			switch (GET_OP(*PC))
-			{
-				case OP_MOVE: {
-
-				} continue;
-
-				// ...
-
-				default: {
-
-				} break;
-
-			}
-			
-			
-		}
-
-	}
+	void Exexcute(VMState* S);
 
 
 };

@@ -50,7 +50,7 @@ static ConVar r_flashlightshadowatten( "r_flashlightshadowatten", "0.35", FCVAR_
 static ConVar r_flashlightladderdist( "r_flashlightladderdist", "40.0", FCVAR_CHEAT );
 static ConVar mat_slopescaledepthbias_shadowmap( "mat_slopescaledepthbias_shadowmap", "16", FCVAR_CHEAT );
 static ConVar mat_depthbias_shadowmap(	"mat_depthbias_shadowmap", "0.0005", FCVAR_CHEAT  );
-
+static ConVar mat_shadow_filter("mat_shadow_filter", "1", FCVAR_CHEAT);
 
 void r_newflashlightCallback_f( IConVar *pConVar, const char *pOldString, float flOldValue )
 {
@@ -336,6 +336,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	state.m_flShadowAtten = r_flashlightshadowatten.GetFloat();
 	state.m_flShadowSlopeScaleDepthBias = mat_slopescaledepthbias_shadowmap.GetFloat();
 	state.m_flShadowDepthBias = mat_depthbias_shadowmap.GetFloat();
+	state.m_flShadowFilterSize = mat_shadow_filter.GetFloat();
 
 	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
 	{
@@ -525,6 +526,7 @@ void CHeadlightEffect::UpdateLight( const Vector &vecPos, const Vector &vecDir, 
 	state.m_bEnableShadows = true;
 	state.m_pSpotlightTexture = m_FlashlightTexture;
 	state.m_nSpotlightTextureFrame = 0;
+	state.m_flShadowFilterSize = mat_shadow_filter.GetFloat();
 	
 	if( GetFlashlightHandle() == CLIENTSHADOW_INVALID_HANDLE )
 	{
