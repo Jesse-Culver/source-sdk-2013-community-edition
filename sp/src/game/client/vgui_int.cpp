@@ -32,8 +32,6 @@
 #include "tf_gamerules.h"
 #endif
 
-#include "SourceCE/vgui_uipanel.h"
-
 using namespace vgui;
 
 void MP3Player_Create( vgui::VPANEL parent );
@@ -197,10 +195,8 @@ bool VGui_Startup( CreateInterfaceFn appSystemFactory )
 //-----------------------------------------------------------------------------
 void VGui_CreateGlobalPanels( void )
 {
-	VPANEL gameRoot = enginevgui->GetPanel( PANEL_CLIENTDLL );
 	VPANEL gameToolParent = enginevgui->GetPanel( PANEL_CLIENTDLL_TOOLS );
 	VPANEL toolParent = enginevgui->GetPanel( PANEL_TOOLS );
-
 #if defined( TRACK_BLOCKING_IO )
 	VPANEL gameDLLPanel = enginevgui->GetPanel( PANEL_GAMEDLL );
 #endif
@@ -216,8 +212,6 @@ void VGui_CreateGlobalPanels( void )
 #endif
 	netgraphpanel->Create( toolParent );
 	debugoverlaypanel->Create( gameToolParent );
-
-	uipanel->Create(gameRoot);
 
 #ifndef _X360
 	// Create mp3 player off of tool parent panel
@@ -246,8 +240,6 @@ void VGui_Shutdown()
 	messagechars->Destroy();
 	loadingdisc->Destroy();
 	internalCenterPrint->Destroy();
-
-	uipanel->Destroy();
 
 	if ( g_pClientMode )
 	{

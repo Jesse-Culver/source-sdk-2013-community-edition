@@ -1,6 +1,6 @@
 DebugMenu
 {
-	"width"		"600"
+	"width"		"512"
 	"height"	"300"
 
 	Performance
@@ -284,9 +284,5 @@ DebugMenu
 		{
 			"command"		"ai_show_graph_connect"
 		}
-	}
-	"Scripting"
-	{
-		
 	}
 }

@@ -174,14 +174,6 @@ Scheme
 				"weight"	"500"
 			}
 		}
-		
-		"Default"
-		{
-			"1"
-			{
-				"antialias"	"1"
-			}
-		}
 
 		"ServerBrowserSmall"
 		{
