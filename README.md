@@ -1,6 +1,6 @@
-# Source SDK 2013 Community Edtion
+# Source SDK 2013 Community Edtion (Lonk Edition)
 
-This is a variation of Source 2013 with community changes to make the game look, run, and play more efficiently and add tools for developers. Some examples are fixing env_projectedtexture, adding Biohazard's ShaderEditor, and more.
+This is my branch. It is crap.
 
 If you want to help contribute, message Wazanator on Steam or on Discord, or join our Discord server: https://discord.gg/FZqp7Cf
 
