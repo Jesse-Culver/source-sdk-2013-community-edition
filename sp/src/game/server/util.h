@@ -112,6 +112,8 @@ inline bool CanCreateEntityClass( const char *pszClassname )
 abstract_class IEntityFactory
 {
 public:
+	const char* internalClassName;
+
 	virtual IServerNetworkable *Create( const char *pClassName ) = 0;
 	virtual void Destroy( IServerNetworkable *pNetworkable ) = 0;
 	virtual size_t GetEntitySize() = 0;
@@ -121,8 +123,11 @@ template <class T>
 class CEntityFactory : public IEntityFactory
 {
 public:
-	CEntityFactory( const char *pClassName )
+	
+
+	CEntityFactory( const char *pClassName, const char* pRealClassName = "Unknown" )
 	{
+		internalClassName = pRealClassName;
 		EntityFactoryDictionary()->InstallFactory( this, pClassName );
 	}
 
@@ -147,7 +152,7 @@ public:
 };
 
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
-	static CEntityFactory<DLLClassName> mapClassName( #mapClassName );
+	static CEntityFactory<DLLClassName> mapClassName( #mapClassName, #DLLClassName );
 
 
 //

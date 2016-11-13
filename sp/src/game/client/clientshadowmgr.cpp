@@ -86,19 +86,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar r_flashlightdrawfrustum( "r_flashlightdrawfrustum", "0" );
-static ConVar r_flashlightmodels( "r_flashlightmodels", "1" );
-static ConVar r_shadowrendertotexture( "r_shadowrendertotexture", "0" );
-static ConVar r_flashlight_version2( "r_flashlight_version2", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY );
 
-ConVar r_flashlightdepthtexture( "r_flashlightdepthtexture", "1" );
 
-#if defined( _X360 )
-ConVar r_flashlightdepthres( "r_flashlightdepthres", "512" );
-#else
-ConVar r_flashlightdepthres( "r_flashlightdepthres", "1024" );
-#endif
+#include "flashlight_shared.h"
 
+// TODO: is it possible to enable this?
 ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0" );
 
 #ifdef _WIN32
@@ -161,10 +153,10 @@ private:
 	enum
 	{
 		INVALID_FRAGMENT_HANDLE = (FragmentHandle_t)~0,
-		TEXTURE_PAGE_SIZE	    = 1024,
-		MAX_TEXTURE_POWER    	= 8,
+		TEXTURE_PAGE_SIZE	    = 4096,	// prev 1024
+		MAX_TEXTURE_POWER    	= 10,	// 1024 (prev 256)
 #if !defined( _X360 )
-		MIN_TEXTURE_POWER	    = 4,
+		MIN_TEXTURE_POWER	    = 4,	// 16
 #else
 		MIN_TEXTURE_POWER	    = 5,	// per resolve requirements to ensure 32x32 aligned offsets
 #endif
@@ -676,7 +668,7 @@ void CTextureAllocator::GetTextureRect(TextureHandle_t handle, int& x, int& y, i
 //-----------------------------------------------------------------------------
 // Defines how big of a shadow texture we should be making per caster...
 //-----------------------------------------------------------------------------
-#define TEXEL_SIZE_PER_CASTER_SIZE	2.0f 
+#define TEXEL_SIZE_PER_CASTER_SIZE	4.0f 
 #define MAX_FALLOFF_AMOUNT 240
 #define MAX_CLIP_PLANE_COUNT 4
 #define SHADOW_CULL_TOLERANCE 0.5f

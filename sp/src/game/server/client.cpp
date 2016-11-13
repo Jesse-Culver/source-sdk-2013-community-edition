@@ -1070,6 +1070,7 @@ void EnableFreecam(CBasePlayer *ply)
 	fc_lastpos = ply->GetAbsOrigin();
 	fc_lastvel = ply->GetAbsVelocity();
 	fc_lastang = ply->GetAbsAngles();
+
 	
 	engine->ServerCommand("ai_disable");
 

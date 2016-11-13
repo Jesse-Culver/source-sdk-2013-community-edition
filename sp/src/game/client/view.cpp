@@ -1153,18 +1153,18 @@ void CViewRender::Render( vrect_t *rect )
 		{
 			case STEREO_EYE_MONO:
 			{
-#if 0
+
                 // Good test mode for debugging viewports that are not full-size.
-	            view.width			= vr.width * flViewportScale * 0.75f;
-	            view.height			= vr.height * flViewportScale * 0.75f;
-	            view.x				= vr.x + view.width * 0.10f;
-	            view.y				= vr.y + view.height * 0.20f;
-#else
+	            //view.width			= vr.width * flViewportScale * 0.75f;
+	            //view.height			= vr.height * flViewportScale * 0.75f;
+	            //view.x				= vr.x + view.width * 0.10f;
+	            //view.y				= vr.y + view.height * 0.20f;
+
 	            view.x				= vr.x * flViewportScale;
 				view.y				= vr.y * flViewportScale;
 				view.width			= vr.width * flViewportScale;
 				view.height			= vr.height * flViewportScale;
-#endif
+
 			    float engineAspectRatio = engine->GetScreenAspectRatio();
 			    view.m_flAspectRatio	= ( engineAspectRatio > 0.0f ) ? engineAspectRatio : ( (float)view.width / (float)view.height );
 			}

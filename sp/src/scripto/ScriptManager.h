@@ -8,7 +8,7 @@
 
 #include "IScriptingLanguage.h"
 
-//#ifdef SCRIPTO_EXPORTS
+//#if defined(SCRIPTO_EXPORTS) //&& !defined(GAME_DLL) && !defined (CLIENT_DLL)
 
 template class DLL_API CUtlMemory < IScriptingLanguage* >;
 template class DLL_API CUtlMemory < const char* >;

@@ -8,3 +8,5 @@
 //
 
 // There are no examples of such shaders in the SDK, but add yours here.
+standard_vs30.fxc
+standard_ps30.fxc

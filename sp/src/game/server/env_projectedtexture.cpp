@@ -60,56 +60,67 @@ private:
 	CNetworkVar( float, m_flNearZ );
 	CNetworkVar( float, m_flFarZ );
 	CNetworkVar( int, m_nShadowQuality );
+	CNetworkVar(float, m_fQuadraticAtten);
+	CNetworkVar(float, m_fLinearAtten);
+	CNetworkVar(float, m_fConstAtten);
 };
 
 LINK_ENTITY_TO_CLASS( env_projectedtexture, CEnvProjectedTexture );
+LINK_ENTITY_TO_CLASS(light_dynamic, CEnvProjectedTexture);
 
-BEGIN_DATADESC( CEnvProjectedTexture )
-	DEFINE_FIELD( m_hTargetEntity, FIELD_EHANDLE ),
-	DEFINE_FIELD( m_bState, FIELD_BOOLEAN ),
-	DEFINE_KEYFIELD( m_flLightFOV, FIELD_FLOAT, "lightfov" ),
-	DEFINE_KEYFIELD( m_bEnableShadows, FIELD_BOOLEAN, "enableshadows" ),
-	DEFINE_KEYFIELD( m_bLightOnlyTarget, FIELD_BOOLEAN, "lightonlytarget" ),
-	DEFINE_KEYFIELD( m_bLightWorld, FIELD_BOOLEAN, "lightworld" ),
-	DEFINE_KEYFIELD( m_bCameraSpace, FIELD_BOOLEAN, "cameraspace" ),
-	DEFINE_KEYFIELD( m_flAmbient, FIELD_FLOAT, "ambient" ),
-	DEFINE_AUTO_ARRAY( m_SpotlightTextureName, FIELD_CHARACTER ),
-	DEFINE_KEYFIELD( m_nSpotlightTextureFrame, FIELD_INTEGER, "textureframe" ),
-	DEFINE_KEYFIELD( m_flNearZ, FIELD_FLOAT, "nearz" ),
-	DEFINE_KEYFIELD( m_flFarZ, FIELD_FLOAT, "farz" ),
-	DEFINE_KEYFIELD( m_nShadowQuality, FIELD_INTEGER, "shadowquality" ),
-	DEFINE_FIELD( m_LinearFloatLightColor, FIELD_VECTOR ), 
+BEGIN_DATADESC(CEnvProjectedTexture)
+	DEFINE_FIELD(m_hTargetEntity, FIELD_EHANDLE),
+	DEFINE_FIELD(m_bState, FIELD_BOOLEAN),
+	DEFINE_KEYFIELD(m_flLightFOV, FIELD_FLOAT, "lightfov"),
+	DEFINE_KEYFIELD(m_bEnableShadows, FIELD_BOOLEAN, "enableshadows"),
+	DEFINE_KEYFIELD(m_bLightOnlyTarget, FIELD_BOOLEAN, "lightonlytarget"),
+	DEFINE_KEYFIELD(m_bLightWorld, FIELD_BOOLEAN, "lightworld"),
+	DEFINE_KEYFIELD(m_bCameraSpace, FIELD_BOOLEAN, "cameraspace"),
+	DEFINE_KEYFIELD(m_flAmbient, FIELD_FLOAT, "ambient"),
+	DEFINE_AUTO_ARRAY(m_SpotlightTextureName, FIELD_CHARACTER),
+	DEFINE_KEYFIELD(m_nSpotlightTextureFrame, FIELD_INTEGER, "textureframe"),
+	DEFINE_KEYFIELD(m_flNearZ, FIELD_FLOAT, "nearz"),
+	DEFINE_KEYFIELD(m_flFarZ, FIELD_FLOAT, "farz"),
+	DEFINE_KEYFIELD(m_nShadowQuality, FIELD_INTEGER, "shadowquality"),
 
-	DEFINE_INPUTFUNC( FIELD_VOID, "TurnOn", InputTurnOn ),
-	DEFINE_INPUTFUNC( FIELD_VOID, "TurnOff", InputTurnOff ),
-	DEFINE_INPUTFUNC( FIELD_FLOAT, "FOV", InputSetFOV ),
-	DEFINE_INPUTFUNC( FIELD_EHANDLE, "Target", InputSetTarget ),
-	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "CameraSpace", InputSetCameraSpace ),
-	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "LightOnlyTarget", InputSetLightOnlyTarget ),
-	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "LightWorld", InputSetLightWorld ),
-	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "EnableShadows", InputSetEnableShadows ),
+	DEFINE_KEYFIELD(m_fQuadraticAtten, FIELD_FLOAT, "quadratic"),
+	DEFINE_KEYFIELD(m_fLinearAtten, FIELD_FLOAT, "linear"),
+	DEFINE_KEYFIELD(m_fConstAtten, FIELD_FLOAT, "const"),
+
+	DEFINE_FIELD(m_LinearFloatLightColor, FIELD_VECTOR),
+
+	DEFINE_INPUTFUNC(FIELD_VOID, "TurnOn", InputTurnOn),
+	DEFINE_INPUTFUNC(FIELD_VOID, "TurnOff", InputTurnOff),
+	DEFINE_INPUTFUNC(FIELD_FLOAT, "FOV", InputSetFOV),
+	DEFINE_INPUTFUNC(FIELD_EHANDLE, "Target", InputSetTarget),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "CameraSpace", InputSetCameraSpace),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "LightOnlyTarget", InputSetLightOnlyTarget),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "LightWorld", InputSetLightWorld),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "EnableShadows", InputSetEnableShadows),
 	// this is broken . . need to be able to set color and intensity like light_dynamic
-//	DEFINE_INPUTFUNC( FIELD_COLOR32, "LightColor", InputSetLightColor ),
-	DEFINE_INPUTFUNC( FIELD_FLOAT, "Ambient", InputSetAmbient ),
-	DEFINE_INPUTFUNC( FIELD_STRING, "SpotlightTexture", InputSetSpotlightTexture ),
-	DEFINE_THINKFUNC( InitialThink ),
+	//	DEFINE_INPUTFUNC( FIELD_COLOR32, "LightColor", InputSetLightColor ),
+	DEFINE_INPUTFUNC(FIELD_FLOAT, "Ambient", InputSetAmbient),
+	DEFINE_INPUTFUNC(FIELD_STRING, "SpotlightTexture", InputSetSpotlightTexture),
+	DEFINE_THINKFUNC(InitialThink),
 END_DATADESC()
 
-IMPLEMENT_SERVERCLASS_ST( CEnvProjectedTexture, DT_EnvProjectedTexture )
-	SendPropEHandle( SENDINFO( m_hTargetEntity ) ),
-	SendPropBool( SENDINFO( m_bState ) ),
-	SendPropFloat( SENDINFO( m_flLightFOV ) ),
-	SendPropBool( SENDINFO( m_bEnableShadows ) ),
-	SendPropBool( SENDINFO( m_bLightOnlyTarget ) ),
-	SendPropBool( SENDINFO( m_bLightWorld ) ),
-	SendPropBool( SENDINFO( m_bCameraSpace ) ),
-	SendPropVector( SENDINFO( m_LinearFloatLightColor ) ),
-	SendPropFloat( SENDINFO( m_flAmbient ) ),
-	SendPropString( SENDINFO( m_SpotlightTextureName ) ),
-	SendPropInt( SENDINFO( m_nSpotlightTextureFrame ) ),
-	SendPropFloat( SENDINFO( m_flNearZ ), 16, SPROP_ROUNDDOWN, 0.0f,  500.0f ),
-	SendPropFloat( SENDINFO( m_flFarZ ),  18, SPROP_ROUNDDOWN, 0.0f, 1500.0f ),
-	SendPropInt( SENDINFO( m_nShadowQuality ), 1, SPROP_UNSIGNED ),  // Just one bit for now
+IMPLEMENT_SERVERCLASS_ST(CEnvProjectedTexture, DT_EnvProjectedTexture)
+	SendPropEHandle(SENDINFO(m_hTargetEntity)),
+	SendPropBool(SENDINFO(m_bState)),
+	SendPropFloat(SENDINFO(m_flLightFOV)),
+	SendPropBool(SENDINFO(m_bEnableShadows)),
+	SendPropBool(SENDINFO(m_bLightOnlyTarget)),
+	SendPropBool(SENDINFO(m_bLightWorld)),
+	SendPropBool(SENDINFO(m_bCameraSpace)),
+	SendPropVector(SENDINFO(m_LinearFloatLightColor)),
+	SendPropFloat(SENDINFO(m_flAmbient)),
+	SendPropString(SENDINFO(m_SpotlightTextureName)),
+	SendPropInt(SENDINFO(m_nSpotlightTextureFrame)),
+	SendPropFloat(SENDINFO(m_flNearZ), 16, SPROP_ROUNDDOWN, 0.0f, 500.0f),
+	SendPropFloat(SENDINFO(m_flFarZ), 18, SPROP_ROUNDDOWN, 0.0f, 1500.0f),
+	SendPropFloat(SENDINFO(m_fQuadraticAtten)),
+	SendPropFloat(SENDINFO(m_fLinearAtten)),
+	SendPropFloat(SENDINFO(m_fConstAtten)),
 END_SEND_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -247,7 +258,7 @@ void CEnvProjectedTexture::InitialThink( void )
 		m_hTargetEntity = gEntList.FindEntityByName( NULL, m_target );
 	if ( m_hTargetEntity == NULL )
 		return;
- 
+	
 	Vector vecToTarget = (m_hTargetEntity->GetAbsOrigin() - GetAbsOrigin());
 	QAngle vecAngles;
 	VectorAngles( vecToTarget, vecAngles );

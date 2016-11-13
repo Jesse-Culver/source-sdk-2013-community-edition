@@ -739,7 +739,6 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// SourceCE Scripting (Lua)
 	Scripto_Init();
 	// client and server should have their own CScriptManager
-	g_scriptManager.AddLanguage(new CLuaLanguage());
 	
 
 	

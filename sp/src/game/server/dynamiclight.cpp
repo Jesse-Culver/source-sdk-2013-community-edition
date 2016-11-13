@@ -46,7 +46,8 @@ public:
 	CNetworkVar( float, m_SpotRadius );
 };
 
-LINK_ENTITY_TO_CLASS(light_dynamic, CDynamicLight);
+// Replaced with CEnvProjectedTexture
+//LINK_ENTITY_TO_CLASS(light_dynamic, CDynamicLight);
 
 BEGIN_DATADESC( CDynamicLight )
 

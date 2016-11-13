@@ -17,9 +17,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar mat_slopescaledepthbias_shadowmap( "mat_slopescaledepthbias_shadowmap", "16", FCVAR_CHEAT );
-static ConVar mat_depthbias_shadowmap(	"mat_depthbias_shadowmap", "0.00001", FCVAR_CHEAT  );
-static ConVar mat_shadow_filter("mat_shadow_filter", "1", FCVAR_CHEAT);
+#include "flashlight_shared.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -59,6 +57,10 @@ private:
 	char	m_SpotlightTextureName[ MAX_PATH ];
 	int		m_nSpotlightTextureFrame;
 	int		m_nShadowQuality;
+
+	float	m_fLinearAtten;
+	float	m_fQuadraticAtten;
+	float	m_fConstAtten;
 };
 
 IMPLEMENT_CLIENTCLASS_DT( C_EnvProjectedTexture, DT_EnvProjectedTexture, CEnvProjectedTexture )
@@ -76,6 +78,9 @@ IMPLEMENT_CLIENTCLASS_DT( C_EnvProjectedTexture, DT_EnvProjectedTexture, CEnvPro
 	RecvPropFloat(	 RECVINFO( m_flNearZ )	),
 	RecvPropFloat(	 RECVINFO( m_flFarZ )	),
 	RecvPropInt(	 RECVINFO( m_nShadowQuality )	),
+	RecvPropFloat(	 RECVINFO(m_fLinearAtten) ),
+	RecvPropFloat(	 RECVINFO(m_fQuadraticAtten)),
+	RecvPropFloat(	 RECVINFO(m_fConstAtten)),
 END_RECV_TABLE()
 
 C_EnvProjectedTexture::C_EnvProjectedTexture( void )
@@ -194,9 +199,9 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 	state.m_vecLightOrigin = vPos;
 	BasisToQuaternion( vForward, vRight, vUp, state.m_quatOrientation );
 
-	state.m_fQuadraticAtten = 0.0;
-	state.m_fLinearAtten = 100;
-	state.m_fConstantAtten = 0.0f;
+	state.m_fQuadraticAtten = m_fQuadraticAtten;
+	state.m_fLinearAtten = m_fLinearAtten;
+	state.m_fConstantAtten = m_fConstAtten;
 	state.m_Color[0] = m_LinearFloatLightColor.x;
 	state.m_Color[1] = m_LinearFloatLightColor.y;
 	state.m_Color[2] = m_LinearFloatLightColor.z;
@@ -210,6 +215,9 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 	state.m_nSpotlightTextureFrame = m_nSpotlightTextureFrame;
 	// TODO: this doesn't seem to work all the time
 	state.m_flShadowFilterSize = mat_shadow_filter.GetFloat();
+	// TODO
+	//state.m_bDrawShadowFrustum = r_flashlightdrawfr
+	
 
 	state.m_nShadowQuality = m_nShadowQuality; // Allow entity to affect shadow quality
 

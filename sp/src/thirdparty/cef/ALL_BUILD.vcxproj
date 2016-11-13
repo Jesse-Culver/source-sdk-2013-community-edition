@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{58F16501-EDCA-3AAC-AAEE-D39982F7954B}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -HC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef -BC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef --check-stamp-file C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeSystem.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeCCompiler.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeCXXCompiler.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeRCCompiler.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cmake\FindCEF.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cmake\cef_variables.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cmake\cef_macros.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -HC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef -BC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef --check-stamp-file C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeSystem.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeCCompiler.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeCXXCompiler.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeGenericSystem.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\WindowsPaths.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC-C.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\3.7.0-rc2\CMakeRCCompiler.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeRCInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCXXInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeLanguageInformation.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Compiler\MSVC-CXX.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\Platform\Windows-MSVC.cmake;C:\Users\jeffr\Home\Bin\cmake\share\cmake-3.7\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cmake\FindCEF.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cmake\cef_variables.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cmake\cef_macros.cmake;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/ZERO_CHECK.vcxproj">
+      <Project>B1B9BCC7-0971-332E-9D5E-64D6DA912A23</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefclient/cefclient.vcxproj">
+      <Project>33E98F86-D679-3DDF-86F8-6BA19EBE0F56</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/cefsimple.vcxproj">
+      <Project>1F9E3602-2A81-388D-8450-0F193A88733D</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/libcef_dll_wrapper/libcef_dll_wrapper.vcxproj">
+      <Project>26CE5243-9658-3573-91BF-D1CEFF90CAE3</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

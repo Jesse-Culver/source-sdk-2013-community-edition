@@ -1037,7 +1037,7 @@
 				"jackIn_00"
 				{
 					"iTarget_node"		"57"
-					"iTarget_jack"		"2"
+					"iTarget_jack"		"1"
 				}
 				"jackIn_01"
 				{
