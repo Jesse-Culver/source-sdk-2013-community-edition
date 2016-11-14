@@ -168,8 +168,8 @@ extern vgui::IInputInternal *g_InputInternal;
 #endif
 
 // Source CE
-#include "scripto/scripto.h"
-#include "scripto/lua.h"
+//#include "scripto/scripto.h"
+//#include "scripto/lua.h"
 
 #include "toolframework/itoolframework.h"
 
@@ -351,7 +351,7 @@ class IClientPurchaseInterfaceV2 *g_pClientPurchaseInterface = (class IClientPur
 
 static ConVar *g_pcv_ThreadMode = NULL;
 
-CScriptManager g_scriptManager;
+//CScriptManager g_scriptManager;
 
 #pragma endregion
 

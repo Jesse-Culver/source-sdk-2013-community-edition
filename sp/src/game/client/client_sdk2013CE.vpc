@@ -126,6 +126,8 @@ $Project "Client (SDK2013CE)"
 			$File	"$SRCDIR\game\shared\hl2\survival_gamerules.cpp"
 			$File	"hl2\vgui_rootpanel_hl2.cpp"
 			$File	"episodic\c_npc_puppet.cpp"
+			$File	"flashlight_shared.cpp"
+			$File	"flashlight_shared.h"
 		}
 		$Folder "Shader Editor" [$WIN32]
 		{
