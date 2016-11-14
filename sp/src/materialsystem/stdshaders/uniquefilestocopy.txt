@@ -4,13 +4,11 @@ C:\Program Files (x86)\Steam\steamapps\common\Source SDK Base 2013 Singleplayer\
 C:\Program Files (x86)\Steam\steamapps\common\Source SDK Base 2013 Singleplayer\bin\shadercompile_dll.dll 
 C:\Program Files (x86)\Steam\steamapps\common\Source SDK Base 2013 Singleplayer\bin\tier0.dll 
 C:\Program Files (x86)\Steam\steamapps\common\Source SDK Base 2013 Singleplayer\bin\vstdlib.dll 
+common_flashlight_fxc.h
 common_fxc.h
 common_hlsl_cpp_consts.h
+common_lightmappedgeneric_fxc.h
 common_pragmas.h
 common_ps_fxc.h
-sse_common_flashlight_fxc.h
-sse_common_lightmappedgeneric_fxc.h
-sse_common_parallax.h
-sse_common_ps_fxc.h
-sse_common_vertexlitgeneric_dx9.h
+common_vertexlitgeneric_dx9.h
 standard_ps30.fxc

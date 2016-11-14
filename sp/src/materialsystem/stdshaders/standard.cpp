@@ -12,21 +12,25 @@
 #include "standard_vs30.inc"
 
 
-
-
 BEGIN_VS_SHADER(Standard, "Help for SourceCE Standard")
 
 
 	BEGIN_SHADER_PARAMS
 		// $color, $alpha, $basetexture, $frame, and $basetexturetransform
 		// are already defined
-		SHADER_PARAM(bumpmap, SHADER_PARAM_TYPE_TEXTURE, "", "bumpmap help")
+		//SHADER_PARAM(bumpmap, SHADER_PARAM_TYPE_TEXTURE, "", "bumpmap help")
+		SHADER_PARAM(color3, SHADER_PARAM_TYPE_COLOR, "[1 0 0 1]", "color3 help")
 	END_SHADER_PARAMS
 
 
 	SHADER_INIT_PARAMS()
 	{
-		
+		if( !params[color3]->IsDefined() )
+		{
+			// Set to red error color.
+			params[color3]->SetVecValue( 1.0f, 0.0f, 0.0f, 1.0f );
+		}
+
 	}
 
 	SHADER_FALLBACK
@@ -39,72 +43,79 @@ BEGIN_VS_SHADER(Standard, "Help for SourceCE Standard")
 		
 	}
 
-	SHADER_DRAW
+	void OnDrawElements(
+		IMaterialVar **params,
+		IShaderShadow* pShaderShadow,
+		IShaderDynamicAPI* pShaderAPI,
+		VertexCompressionType_t vertexCompression,
+		CBasePerMaterialContextData **pContextDataPtr)
 	{
-		// ----------------------------------------------------------------------------
-		// This section is called when the shader is bound for the first time.
-		// ----------------------------------------------------------------------------
-		SHADOW_STATE
+		// Shadow State (Init)
+		if (pShaderShadow)
 		{
-// Shadow State
-			// Setup the vertex format.
 			int fmt = VERTEX_POSITION | VERTEX_NORMAL | VERTEX_TANGENT_S;
 			// 1 texcoord, unspecified texcoord size, empty userdata
 			pShaderShadow->VertexShaderVertexFormat(fmt, 1, NULL, 0);
-			// TODO: Fog support
-			DisableFog();
-			// TODO: Blending support
-			pShaderShadow->EnableBlending(false);
 
-			// We don't need to write to the depth buffer.
+
+			DisableFog(); // TODO: Fog
+			pShaderShadow->EnableBlending(false); // TODO: Blending
+
 			pShaderShadow->EnableDepthWrites(false);
 
-			// Precache and set the screenspace shader.
-// VS
+			
+// VS - Static //
 			DECLARE_STATIC_VERTEX_SHADER(standard_vs30);
-			SET_STATIC_VERTEX_SHADER_COMBO(FLASHLIGHT, false);
+
+				SET_STATIC_VERTEX_SHADER_COMBO(FLASHLIGHT, false);
+
 			SET_STATIC_VERTEX_SHADER(standard_vs30);
 
-// PS		
+// PS - Static //	
 			DECLARE_STATIC_PIXEL_SHADER(standard_ps30);
+
+
+
 			SET_STATIC_PIXEL_SHADER(standard_ps30);
 		}
 
-		// ----------------------------------------------------------------------------
-		// This section is called every frame.
-		// ----------------------------------------------------------------------------
-		DYNAMIC_STATE
+		// Dynamic State (Frame)
+		if (pShaderAPI)
 		{
-// Dynamic State
-			//ITexture* s0 = params[basetexture]->GetTextureValue();
-			//BindTexture(SHADER_SAMPLER0, s0);
-			pShaderAPI->BindStandardTexture(SHADER_SAMPLER0, TEXTURE_GREY);
-			pShaderAPI->BindStandardTexture(SHADER_SAMPLER1, TEXTURE_NORMALMAP_FLAT);
+			
+			
+			//pShaderAPI->BindStandardTexture(SHADER_SAMPLER0, TEXTURE_GREY);
+			//pShaderAPI->BindStandardTexture(SHADER_SAMPLER1, TEXTURE_NORMALMAP_FLAT);
 
 			// TODO: Lightmap support
 
-// VS
+// VS - Dynamic //
 			DECLARE_DYNAMIC_VERTEX_SHADER(standard_vs30);
 			
-			// TODO: set tiling parameter
-
-			SET_DYNAMIC_VERTEX_SHADER_COMBO(COMPRESSED_VERTS, true);
-			SET_DYNAMIC_VERTEX_SHADER_COMBO(MORPHING, true);
-			SET_DYNAMIC_VERTEX_SHADER_COMBO(SKINNING, true);
+				//float c0[4];
+				//params[color3]->GetVecValue(c0, 4);
+				//pShaderAPI->SetPixelShaderConstant(0, c0, ARRAYSIZE(c0) / 4);
+				
+			BindTexture(SHADER_SAMPLER0, BASETEXTURE, FRAME);
+				
+				SET_DYNAMIC_VERTEX_SHADER_COMBO(COMPRESSED_VERTS, true);
+				SET_DYNAMIC_VERTEX_SHADER_COMBO(MORPHING, false);
+				SET_DYNAMIC_VERTEX_SHADER_COMBO(SKINNING, false);
 			
 			SET_DYNAMIC_VERTEX_SHADER(standard_vs30);
 
 			
-// PS
+// PS - Dynamic //
 			DECLARE_DYNAMIC_PIXEL_SHADER(standard_ps30);
 
-			// TODO: Pass actual number of lights
-			SET_DYNAMIC_PIXEL_SHADER_COMBO(NUM_LIGHTS, 1);
+			
+				//pShaderAPI->GetCurrentLightCombo();
+				SET_DYNAMIC_PIXEL_SHADER_COMBO(NUM_LIGHTS, 1);
 
 			SET_DYNAMIC_PIXEL_SHADER(standard_ps30);
 		}
 
-
+		// Draw Call
 		Draw();
 	}
 

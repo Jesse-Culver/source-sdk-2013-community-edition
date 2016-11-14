@@ -17,14 +17,10 @@ Files added: ShaderEditorSystem.cpp, ShaderEditorSystem.h, SEdit_ModelRender.cpp
 Notes: Run with the launch parameter "-shaderedit" to open SSE
 
 **********
-Static Prop Scaling
-(UNFINISHED)
+PBR Shaders
 **********
 Authors(s): DankParrot
-Files modified:
-	utils/vbsp/StaticProp.cpp
-		(and other related files)
-	game\sdk2013CE\sdk2013ce.fgd
+
 *********
 
 *********

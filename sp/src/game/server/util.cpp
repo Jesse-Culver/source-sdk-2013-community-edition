@@ -65,27 +65,7 @@ void DBG_AssertFunction( bool fExpr, const char *szExpr, const char *szFile, int
 
 
 //-----------------------------------------------------------------------------
-// Entity creation factory
-//-----------------------------------------------------------------------------
-class CEntityFactoryDictionary : public IEntityFactoryDictionary
-{
-public:
-	CEntityFactoryDictionary();
-
-	virtual void InstallFactory( IEntityFactory *pFactory, const char *pClassName );
-	virtual IServerNetworkable *Create( const char *pClassName );
-	virtual void Destroy( const char *pClassName, IServerNetworkable *pNetworkable );
-	virtual const char *GetCannonicalName( const char *pClassName );
-	void ReportEntitySizes();
-
-private:
-	IEntityFactory *FindFactory( const char *pClassName );
-public:
-	CUtlDict< IEntityFactory *, unsigned short > m_Factories;
-};
-
-//-----------------------------------------------------------------------------
-// Singleton accessor
+// Singleton IEntityFactoryDictionary accessor
 //-----------------------------------------------------------------------------
 IEntityFactoryDictionary *EntityFactoryDictionary()
 {

@@ -32,6 +32,8 @@
 #include "shareddefs.h"
 #include "networkvar.h"
 
+#include "utldict.h"
+
 struct levellist_t;
 class IServerNetworkable;
 class IEntityFactory;
@@ -119,6 +121,24 @@ public:
 	virtual size_t GetEntitySize() = 0;
 };
 
+
+class CEntityFactoryDictionary : public IEntityFactoryDictionary
+{
+public:
+	CEntityFactoryDictionary();
+
+	virtual void InstallFactory( IEntityFactory *pFactory, const char *pClassName );
+	virtual IServerNetworkable *Create( const char *pClassName );
+	virtual void Destroy( const char *pClassName, IServerNetworkable *pNetworkable );
+	virtual const char *GetCannonicalName( const char *pClassName );
+	void ReportEntitySizes();
+
+private:
+	IEntityFactory *FindFactory( const char *pClassName );
+public:
+	CUtlDict< IEntityFactory *, unsigned short > m_Factories;
+};
+
 template <class T>
 class CEntityFactory : public IEntityFactory
 {
@@ -153,6 +173,7 @@ public:
 
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
 	static CEntityFactory<DLLClassName> mapClassName( #mapClassName, #DLLClassName );
+
 
 
 //

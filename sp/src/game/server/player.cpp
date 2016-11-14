@@ -6136,7 +6136,8 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		gEvilImpulse101 = true;
 
 		EquipSuit();
-
+		
+		
 		// Give the player everything!
 		GiveAmmo( 255,	"Pistol");
 		GiveAmmo( 255,	"AR2");
@@ -6163,12 +6164,12 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		GiveNamedItem( "weapon_357" );
 		GiveNamedItem( "weapon_crossbow" );
 #ifdef HL2_EPISODIC
-		// GiveNamedItem( "weapon_magnade" );
-#endif
-		if ( GetHealth() < 100 )
-		{
-			TakeHealth( 25, DMG_GENERIC );
-		}
+		//GiveNamedItem( "weapon_magnade" );
+#endif*/
+		//if ( GetHealth() < 100 )
+		//{
+			//TakeHealth( 25, DMG_GENERIC );
+		//}
 		
 		gEvilImpulse101		= false;
 

@@ -1,0 +1,73 @@
+// *********************************
+// ** auto generated vertexshader **
+// *********************************
+
+#define SHADER_EDITOR_2013_COMPILE
+
+// Combos
+// DYNAMIC: "COMPRESSED_VERTS"		"0..1"
+// DYNAMIC: "MORPHING"		"0..1"
+// DYNAMIC: "SKINNING"		"0..1"
+// STATIC: "FLASHLIGHT"		"0..1"
+
+// Includes
+#include "common_vs_fxc.h"
+
+
+// Samplers
+sampler2D morphSampler		: register( D3DVERTEXTEXTURESAMPLER0, s0 );
+
+// Constants
+const float3 _g_VecOrig		: register( c48 );
+const float4x4 g_cFlashlightWorldToTexture		: register( c49 );
+#ifdef SHADER_MODEL_VS_3_0
+const float3 g_cMorphTargetTextureDim		: register( SHADER_SPECIFIC_CONST_10 );
+const float4 g_cMorphSubrect				: register( SHADER_SPECIFIC_CONST_11 );
+#endif
+
+// Semantic structures
+struct VS_INPUT
+{
+	float3 vPos					:	POSITION;
+	float3 vFlexDelta			:	POSITION1;
+	float3 vFlexDelta_Normal	:	NORMAL1;
+	float4 vBoneWeights			:	BLENDWEIGHT;
+	float4 vBoneIndices			:	BLENDINDICES;
+	float4 vNormal				:	NORMAL;
+	float4 vTangent_S			:	TANGENT;
+	float2 vTexCoord_0			:	TEXCOORD0;
+#ifdef SHADER_MODEL_VS_3_0
+	float vVertexID				: POSITION2;
+#endif
+};
+
+struct VS_OUTPUT
+{
+	float4 ProjPos				:	POSITION;
+
+	float2 UV					:	TEXCOORD0;
+	float3 WNormal				:	TEXCOORD1;
+	float3 WPos					:	TEXCOORD2;
+
+	float4 VAttn				:	TEXCOORD3;
+
+	float4 _ProjPos				:	TEXCOORD4;
+
+	float3 TanS					:	TEXCOORD5;
+	float3 TanT					:	TEXCOORD6;
+
+	float3 Eye2World			:	TEXCOORD7;
+};
+
+VS_OUTPUT main( const VS_INPUT In )
+{
+	VS_OUTPUT Out = (VS_OUTPUT)0;
+
+	float4 vProjPos = mul( float4( In.vPos, 1 ), cViewProj );
+	Out.ProjPos = vProjPos;
+	Out._ProjPos = vProjPos;
+	Out.UV = In.vTexCoord_0;
+	//vProjPos.z = dot( float4( In.vPos, 1 ), cViewProjZ );
+
+	return Out;
+}
