@@ -41,10 +41,16 @@ public:
 	// Destroys the script engine.
 	void Terminate();
 
-	///////////////////////////////////////////////////////////
-	// Hooks:
-	//	Script functions that can be called from C++
-	///////////////////////////////////////////////////////////
+	/************************************************************
+		Globals
+	************************************************************/
+
+	void SetGlobal(const char* name, int i);
+
+	/************************************************************
+	 Hooks:
+		Script functions that can be called from C++
+	************************************************************/
 
 	// Register a hook
 	void AddHook(const char* name);
@@ -54,10 +60,10 @@ public:
 	// Get a list of all hook names
 	CUtlVector<const char*>* GetHooks() { return &hooks; };
 
-	///////////////////////////////////////////////////////////
-	// Binds:
-	//	C++ functions that can be called from scripts
-	///////////////////////////////////////////////////////////
+	/************************************************************
+	 Binds:
+		C++ functions that can be called from scripts
+	************************************************************/
 
 	//template<typename R, typename... Args>
 	//void AddBind(const char* name, void* func);

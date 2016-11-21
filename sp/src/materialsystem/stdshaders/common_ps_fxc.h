@@ -48,7 +48,7 @@ const float4 g_LinearFogColor : register( c29 );
 // Linear and gamma light scale values
 const float4 cLightScale : register( c30 );
 #define LINEAR_LIGHT_SCALE (cLightScale.x)
-#define LIGHT_MAP_SCALE (cLightScale.y)
+#define LIGHT_MAP_SCALE (Scale.y)
 #define ENV_MAP_SCALE (cLightScale.z)
 #define GAMMA_LIGHT_SCALE (cLightScale.w)
 

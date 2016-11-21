@@ -10,7 +10,7 @@ void r_newflashlightCallback_f( IConVar *pConVar, const char *pOldString, float 
 extern ConVar r_flashlightdrawfrustum;// ("r_flashlightdrawfrustum", "0");
 extern ConVar r_flashlightmodels;// ("r_flashlightmodels", "1");
 extern ConVar r_shadowrendertotexture;// ("r_shadowrendertotexture", "0");
-extern ConVar r_flashlight_version2;// ("r_flashlight_version2", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Xbox 360 Flashlight Optimization");
+extern ConVar r_flashlight_xbox;// ("r_flashlight_version2", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Xbox 360 Flashlight Optimization");
 
 extern ConVar r_flashlightdepthres;
 

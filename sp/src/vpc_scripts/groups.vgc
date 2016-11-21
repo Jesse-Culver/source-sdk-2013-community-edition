@@ -13,12 +13,15 @@ $Group "sdk2013ce"
 {
 	"client"
 	"server"
+	"client_editor"
+	"server_editor"
 	"game_shader_dx9"
 	"tier1"
 	"vgui_controls"
 	"mathlib"
 	"raytrace"
 	"scripto"
+	"vrad_dll"
 }
 
 $Group "gamedlls"

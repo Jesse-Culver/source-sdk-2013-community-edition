@@ -119,7 +119,8 @@ bool CVRadDLL::Init( char const *pFilename )
 	
 	// Set options and run vrad startup code.
 	do_fast = true;
-	g_bLowPriorityThreads = true;
+	//g_bLowPriorityThreads = true;
+	g_bLowPriorityThreads = false;
 	g_pIncremental = GetIncremental();
 
 	VRAD_LoadBSP( pFilename );

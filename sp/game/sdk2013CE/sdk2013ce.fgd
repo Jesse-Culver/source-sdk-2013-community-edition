@@ -122,7 +122,7 @@
 	
 	constant(float)	: "Constant Falloff" : 0
 	linear(float)	: "Linear Falloff" : 100
-	quadratic(float): "Quadratic Falloff": 1
+	quadratic(float): "Quadratic Falloff": 0
 
 	// Inputs
 	input TurnOn(void)		: "Turn on the texture"
@@ -130,11 +130,11 @@
 	input SetFOV(float)		: "Set FOV"
 ]
 
-@PointClass base(env_projectedtexture_base) = env_projectedtexture :
+@PointClass base(env_projectedtexture_base) = env_projectedtexture : ""
 [
 ]
 
-@PointClass base(env_projectedtexture_base) = light_dynamic :
+@PointClass base(env_projectedtexture_base) = light_dynamic : ""
 [
 ]
 

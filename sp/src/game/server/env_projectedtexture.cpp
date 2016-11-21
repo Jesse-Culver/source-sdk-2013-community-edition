@@ -63,6 +63,7 @@ private:
 	CNetworkVar(float, m_fQuadraticAtten);
 	CNetworkVar(float, m_fLinearAtten);
 	CNetworkVar(float, m_fConstAtten);
+	
 };
 
 LINK_ENTITY_TO_CLASS( env_projectedtexture, CEnvProjectedTexture );
@@ -147,7 +148,14 @@ CEnvProjectedTexture::CEnvProjectedTexture( void )
 	m_flAmbient = 0.0f;
 	m_flNearZ = 4.0f;
 	m_flFarZ = 750.0f;
-	m_nShadowQuality = 0;
+
+	// Creates shadows by default
+	m_bEnableShadows = true;
+	m_nShadowQuality = 1;
+
+	m_fQuadraticAtten = 0.f;
+	m_fLinearAtten = 100.f;
+	m_fConstAtten = 0.f;
 }
 
 void UTIL_ColorStringToLinearFloatColor( Vector &color, const char *pString )

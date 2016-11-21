@@ -1,73 +1,90 @@
-// *********************************
-// ** auto generated vertexshader **
-// *********************************
+//===================== Copyright (c) Valve Corporation. All Rights Reserved. ======================
+//
+// Example vertex shader that can be applied to models
+//
+//==================================================================================================
 
-#define SHADER_EDITOR_2013_COMPILE
+//  DYNAMIC: "COMPRESSED_VERTS"			"0..1"
+//	DYNAMIC: "SKINNING"					"0..1"
+//  DYNAMIC: "LIGHTING_PREVIEW"			"0..1"
+//  DYNAMIC: "NUM_LIGHTS"				"0..4"
 
-// Combos
-// DYNAMIC: "COMPRESSED_VERTS"		"0..1"
-// DYNAMIC: "MORPHING"		"0..1"
-// DYNAMIC: "SKINNING"		"0..1"
-// STATIC: "FLASHLIGHT"		"0..1"
-
-// Includes
 #include "common_vs_fxc.h"
 
+static const bool g_bSkinning = SKINNING ? true : false;
 
-// Samplers
-sampler2D morphSampler		: register( D3DVERTEXTEXTURESAMPLER0, s0 );
+const float4 cBaseTexCoordTransform[2] : register(SHADER_SPECIFIC_CONST_0);
 
-// Constants
-const float3 _g_VecOrig		: register( c48 );
-const float4x4 g_cFlashlightWorldToTexture		: register( c49 );
-#ifdef SHADER_MODEL_VS_3_0
-const float3 g_cMorphTargetTextureDim		: register( SHADER_SPECIFIC_CONST_10 );
-const float4 g_cMorphSubrect				: register( SHADER_SPECIFIC_CONST_11 );
-#endif
-
-// Semantic structures
+//-----------------------------------------------------------------------------
+// Input vertex format
+//-----------------------------------------------------------------------------
 struct VS_INPUT
 {
-	float3 vPos					:	POSITION;
-	float3 vFlexDelta			:	POSITION1;
-	float3 vFlexDelta_Normal	:	NORMAL1;
-	float4 vBoneWeights			:	BLENDWEIGHT;
-	float4 vBoneIndices			:	BLENDINDICES;
-	float4 vNormal				:	NORMAL;
-	float4 vTangent_S			:	TANGENT;
-	float2 vTexCoord_0			:	TEXCOORD0;
-#ifdef SHADER_MODEL_VS_3_0
-	float vVertexID				: POSITION2;
-#endif
+	// This is all of the stuff that we ever use.
+	float4 vPos : POSITION;
+	float4 vBoneWeights : BLENDWEIGHT;
+	float4 vBoneIndices : BLENDINDICES;
+	float4 vNormal : NORMAL;
+	float2 vTexCoord0 : TEXCOORD0;
+
+	float3 vTangentS : TANGENT;
+	float4 vUserData : BINORMAL;
 };
 
 struct VS_OUTPUT
 {
-	float4 ProjPos				:	POSITION;
-
-	float2 UV					:	TEXCOORD0;
-	float3 WNormal				:	TEXCOORD1;
-	float3 WPos					:	TEXCOORD2;
-
-	float4 VAttn				:	TEXCOORD3;
-
-	float4 _ProjPos				:	TEXCOORD4;
-
-	float3 TanS					:	TEXCOORD5;
-	float3 TanT					:	TEXCOORD6;
-
-	float3 Eye2World			:	TEXCOORD7;
+	// Stuff that isn't seen by the pixel shader
+	float4 projPosSetup : POSITION;
+	//float fog : FOG;
+	// Stuff that is seen by the pixel shader
+	float2 baseTexCoord		: TEXCOORD0;
+	float4 lightAtten		: TEXCOORD1;
+	float3 worldNormal		: TEXCOORD2;
+	float3 worldPos			: TEXCOORD3;
+	float3 projPos			: TEXCOORD4;
+	float4 worldTangent		: TEXCOORD5;
 };
 
-VS_OUTPUT main( const VS_INPUT In )
+//-----------------------------------------------------------------------------
+// Main shader entry point
+//-----------------------------------------------------------------------------
+VS_OUTPUT main(const VS_INPUT v)
 {
-	VS_OUTPUT Out = (VS_OUTPUT)0;
+	VS_OUTPUT o = (VS_OUTPUT) 0;
 
-	float4 vProjPos = mul( float4( In.vPos, 1 ), cViewProj );
-	Out.ProjPos = vProjPos;
-	Out._ProjPos = vProjPos;
-	Out.UV = In.vTexCoord_0;
-	//vProjPos.z = dot( float4( In.vPos, 1 ), cViewProjZ );
+	float3 vNormal;
+	float4 vTangent;
+	DecompressVertex_NormalTangent(v.vNormal, v.vUserData, vNormal, vTangent);
 
-	return Out;
+	float3 worldNormal, worldPos, worldTangentS, worldTangentT;
+	SkinPositionNormalAndTangentSpace(g_bSkinning, v.vPos, vNormal, vTangent, v.vBoneWeights, v.vBoneIndices, worldPos, worldNormal, worldTangentS, worldTangentT);
+
+	// Transform into projection space
+	float4 vProjPos = mul(float4(worldPos, 1), cViewProj);
+	o.projPosSetup = vProjPos;
+	vProjPos.z = dot(float4(worldPos, 1), cViewProjZ);
+
+	o.projPos = vProjPos.xyz;
+	//o.fog = CalcFog(worldPos, vProjPos.xyz, g_FogType);
+
+	// Needed for water fog alpha and diffuse lighting 
+	o.worldPos = worldPos;
+	o.worldNormal = normalize(worldNormal);
+
+	// Scalar attenuations for four lights
+	o.lightAtten.xyz = float4(0, 0, 0, 0);
+	[unroll]
+	for (uint i = 0; i < NUM_LIGHTS; i++)
+	{
+		o.lightAtten[0] = GetVertexAttenForLight(worldPos, 0, false);
+
+	}
+
+	// Base texture coordinate transform
+	o.baseTexCoord.x = dot(v.vTexCoord0, cBaseTexCoordTransform[0]);
+	o.baseTexCoord.y = dot(v.vTexCoord0, cBaseTexCoordTransform[1]);
+
+	o.worldTangent = float4(worldTangentS.xyz, vTangent.w);
+
+	return o;
 }

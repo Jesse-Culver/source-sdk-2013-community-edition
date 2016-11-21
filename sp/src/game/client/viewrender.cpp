@@ -80,6 +80,9 @@
 //SSE
 #include "shadereditor/shadereditorsystem.h"
 
+
+#include "flashlight_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -93,7 +96,7 @@ static ConCommand test_freezeframe( "test_freezeframe", testfreezeframe_f, "Test
 //-----------------------------------------------------------------------------
 
 static ConVar r_visocclusion( "r_visocclusion", "0", FCVAR_CHEAT );
-extern ConVar r_flashlightdepthtexture;
+//extern ConVar r_flashlightdepthtexture;
 extern ConVar vcollide_wireframe;
 extern ConVar mat_motion_blur_enabled;
 extern ConVar r_depthoverlay;

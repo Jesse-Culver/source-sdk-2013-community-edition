@@ -1,14 +1,18 @@
 #include "cbase.h"
 #include "ScriptManager.h"
 
+// For-Each Language (i) In (languages)
+#define INVOKE for (int i = 0; i < languages.Count(); i++)
+
+
 CScriptManager::CScriptManager()
 {
-
+	
 }
 
 void CScriptManager::Terminate()
 {
-	for (int i = 0; i < languages.Count(); i++) {
+	INVOKE {
 		languages[i]->Terminate();
 	}
 }
@@ -21,13 +25,18 @@ int CScriptManager::AddLanguage(IScriptingLanguage* language)
 }
 
 
+void CScriptManager::SetGlobal(const char* name, int i)
+{ INVOKE { languages[i]->SetGlobal(name, i); } }
+
+
 
 void CScriptManager::AddHook(const char* name)
 {
 	ScriptLog("Added Hook: %s", name);
 
 	hooks.AddToTail(name);
-	for (int i = 0; i < languages.Count(); i++) {
+
+	INVOKE {
 		languages[i]->AddHook(name);
 	}
 }
@@ -40,7 +49,8 @@ bool CScriptManager::CallHook(const char* name, ...)
 	va_start(args, name);
 
 	bool ret = true;
-	for (int i = 0; i < languages.Count(); i++) {
+
+	INVOKE {
 		ret &= languages[i]->CallHook(name, args);
 	}
 	

@@ -256,25 +256,24 @@ exit 1
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseVSShader.h" />
-    <ClInclude Include="common_fxc.h" />
-    <ClInclude Include="common_hlsl_cpp_consts.h" />
-    <ClInclude Include="common_ps_fxc.h" />
-    <ClInclude Include="common_vertexlitgeneric_dx9.h" />
-    <ClInclude Include="common_vs_fxc.h" />
+    <None Include="common_fxc.h" />
+    <None Include="common_hlsl_cpp_consts.h" />
+    <None Include="common_ps_fxc.h" />
+    <None Include="common_vertexlitgeneric_dx9.h" />
+    <None Include="common_vs_fxc.h" />
+    <None Include="common_flashlight_fxc.h" />
     <ClInclude Include="example_model_dx9_helper.h" />
     <ClInclude Include="shader_constant_register_map.h" />
+    <ClInclude Include="standard_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseVSShader.cpp" />
-    <ClCompile Include="Bloom.cpp" />
-    <ClCompile Include="example_model_dx9.cpp" />
-    <ClCompile Include="example_model_dx9_helper.cpp" />
     <ClCompile Include="..\..\public\tier0\memoverride.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="screenspace_general.cpp" />
     <ClCompile Include="standard.cpp" />
+    <ClCompile Include="standard_helper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="stdshader_dx9_30.txt" />
@@ -319,6 +318,7 @@ echo crc_complete &gt; C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp
     <None Include="..\..\vpc_scripts\source_video_base.vpc" />
     <None Include="..\..\vpc_scripts\source_win32_base.vpc" />
     <None Include="..\..\vpc_scripts\version.vpc" />
+    <None Include="PBR.fxc" />
     <None Include="standard_ps30.fxc" />
     <None Include="standard_vs30.fxc" />
   </ItemGroup>

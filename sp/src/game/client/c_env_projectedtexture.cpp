@@ -14,10 +14,12 @@
 #include "texture_group_names.h"
 #include "tier0/icommandline.h"
 
+#include "flashlight_shared.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#include "flashlight_shared.h"
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -98,6 +100,7 @@ void C_EnvProjectedTexture::ShutDownLightHandle( void )
 	// Clear out the light
 	if( m_LightHandle != CLIENTSHADOW_INVALID_HANDLE )
 	{
+		DevMsg("Dynamic light removed.\n");
 		g_pClientShadowMgr->DestroyFlashlight( m_LightHandle );
 		m_LightHandle = CLIENTSHADOW_INVALID_HANDLE;
 	}
@@ -223,6 +226,7 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 
 	if( m_LightHandle == CLIENTSHADOW_INVALID_HANDLE )
 	{
+		DevMsg("Dynamic light added. C: %f  L: %f  Q: %f\n", m_fConstAtten, m_fLinearAtten, m_fQuadraticAtten);
 		m_LightHandle = g_pClientShadowMgr->CreateFlashlight( state );
 	}
 	else

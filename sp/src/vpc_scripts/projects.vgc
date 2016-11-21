@@ -24,6 +24,17 @@ $Project "client"
 	//"game\client\client_episodic.vpc"	[($WIN32||$X360||$POSIX) && $EPISODIC]
 	"game\client\client_sdk2013CE.vpc"	[($WIN32||$X360||$POSIX)]
 }
+
+$Project "client_editor"
+{
+	"game\client\client_editor.vpc"
+}
+
+$Project "server_editor"
+{
+	"game\server\server_editor.vpc"
+}
+
 $Project "fgdlib"
 {
 	"fgdlib\fgdlib.vpc" [$WIN32]

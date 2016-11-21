@@ -19,16 +19,12 @@
 #include "c_basehlplayer.h"
 #endif // HL2_CLIENT_DLL
 
-#if defined( _X360 )
-extern ConVar r_flashlightdepthres;
-#else
-extern ConVar r_flashlightdepthres;
-#endif
+#include "flashlight_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#include "flashlight_shared.h"
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -339,9 +335,8 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 #endif
 }
 
-//-----------------------------------------------------------------------------
+// -- DEPRECATED -- 
 // Purpose: Do the headlight
-//-----------------------------------------------------------------------------
 void CFlashlightEffect::UpdateLightOld(const Vector &vecPos, const Vector &vecDir, int nDistance)
 {
 	if ( !m_pPointLight || ( m_pPointLight->key != m_nEntIndex ))
@@ -387,9 +382,7 @@ void CFlashlightEffect::UpdateLightOld(const Vector &vecPos, const Vector &vecDi
 	LightOffNew();
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Do the headlight
-//-----------------------------------------------------------------------------
 void CFlashlightEffect::UpdateLight(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance)
 {
 	if ( !m_bIsOn )
@@ -407,9 +400,6 @@ void CFlashlightEffect::UpdateLight(const Vector &vecPos, const Vector &vecDir, 
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 void CFlashlightEffect::LightOffNew()
 {
 #ifndef NO_TOOLFRAMEWORK
@@ -434,6 +424,7 @@ void CFlashlightEffect::LightOffNew()
 }
 
 //-----------------------------------------------------------------------------
+// -- DEPRECATED --
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CFlashlightEffect::LightOffOld()

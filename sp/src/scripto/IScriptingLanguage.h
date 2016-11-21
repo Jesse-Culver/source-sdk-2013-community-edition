@@ -15,6 +15,8 @@ public:
 	virtual void Initialize()=0;
 	virtual void Terminate()=0;
 
+	virtual void SetGlobal(const char* name, int i) = 0;
+
 	// Register a hook
 	virtual void AddHook(const char* name)=0;
 	// Call a  hook

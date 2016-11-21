@@ -12,8 +12,8 @@ void Scripto_Init()
 
 	//g_scriptManager.AddLanguage(new CLuaLanguage());
 
-	vm = new CVirtualMachine();
-	g_scriptManager.AddLanguage(vm);
+	//vm = new CVirtualMachine();
+	//g_scriptManager.AddLanguage(vm);
 
 	g_scriptManager.AddHook("DLLInit");
 	g_scriptManager.AddHook("PostInit");

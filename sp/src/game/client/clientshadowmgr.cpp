@@ -82,13 +82,18 @@
 #include "bonetoworldarray.h"
 #include "cmodel.h"
 
+#include "flashlight_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 
+#if defined( _X360 )
+ConVar r_flashlightdepthres( "r_flashlightdepthres", "512" );
+#else
+ConVar r_flashlightdepthres( "r_flashlightdepthres", "1024" );
+#endif
 
-#include "flashlight_shared.h"
 
 // TODO: is it possible to enable this?
 ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0" );
@@ -1283,6 +1288,7 @@ bool CClientShadowMgr::Init()
 	SetShadowBlobbyCutoffArea( 0.005 );
 
 //	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
+
 	m_nMaxDepthTextureShadows = 10;
 
 	bool bLowEnd = ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 );
@@ -1768,7 +1774,9 @@ void CClientShadowMgr::RenderShadowTexture( int w, int h )
 	if (m_RenderToTextureActive)
 	{
 		CMatRenderContextPtr pRenderContext( materials );
+
 		pRenderContext->Bind( m_RenderShadow );
+		
 		IMesh* pMesh = pRenderContext->GetDynamicMesh( true );
 
 		CMeshBuilder meshBuilder;
@@ -2621,7 +2629,7 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 	// For the 360, we just draw flashlights with the main geometry
 	// and bypass the entire shadow casting system.
 	ClientShadow_t &shadow = m_Shadows[handle];
-	if ( IsX360() || r_flashlight_version2.GetInt() )
+	if ( IsX360() || r_flashlight_xbox.GetInt() )
 	{
 		// This will update the matrices, but not do work to add the flashlight to surfaces
 		shadowmgr->ProjectFlashlight( shadow.m_ShadowHandle, shadow.m_WorldToShadow, 0, NULL );
@@ -3863,19 +3871,22 @@ int CClientShadowMgr::BuildActiveShadowDepthList( const CViewSetup &viewSetup, i
 			continue;
 
 		// Calculate an AABB around the shadow frustum
-	/*	Vector vecAbsMins, vecAbsMaxs;
+		
+		Vector vecAbsMins, vecAbsMaxs;
 		CalculateAABBFromProjectionMatrix( shadow.m_WorldToShadow, &vecAbsMins, &vecAbsMaxs );
 
 		Frustum_t viewFrustum;
 		GeneratePerspectiveFrustum( viewSetup.origin, viewSetup.angles, viewSetup.zNear, viewSetup.zFar, viewSetup.fov, viewSetup.m_flAspectRatio, viewFrustum );
 
-		// FIXME: Could do other sorts of culling here, such as frustum-frustum test, distance etc.
-		// If it's not in the view frustum, move on
+		
+
+		//// FIXME: Could do other sorts of culling here, such as frustum-frustum test, distance etc.
+		//// If it's not in the view frustum, move on
 		if ( R_CullBox( vecAbsMins, vecAbsMaxs, viewFrustum ) )
 		{
-			shadowmgr->SetFlashlightDepthTexture( shadow.m_ShadowHandle, NULL, 0 );
-			continue;
-		}*/
+			//shadowmgr->SetFlashlightDepthTexture( shadow.m_ShadowHandle, NULL, 0 );
+			//continue;
+		}
 
 		if ( nActiveDepthShadowCount >= nMaxDepthShadows )
 		{
@@ -3904,7 +3915,7 @@ void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, Clien
 	// NOTE: On the 360, we render the entire scene with the flashlight state
 	// set and don't render flashlights additively in the shadow mgr at a far later time
 	// because the CPU costs are prohibitive
-	if ( !IsX360() && !r_flashlight_version2.GetInt() )
+	if ( !IsX360() && !r_flashlight_xbox.GetInt() )
 		return;
 
 	Assert( nActiveFlashlightCount<= 1 ); 
