@@ -1,0 +1,10 @@
+"Standard"
+{
+	$surfaceprop	"wood"
+	$basetexture	"pbr/tiles_albedo"
+	$bumpmap		"pbr/tiles_normal"
+	$specmap		"pbr/tiles_specular"
+	$gloss			1
+	
+	$halflambert	1
+}

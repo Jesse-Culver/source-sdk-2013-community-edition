@@ -1056,71 +1056,6 @@ static int FindPassableSpace( CBasePlayer *pPlayer, const Vector& direction, flo
 	return 0;
 }
 
-//------------------------------------------------------------------------------
-// Freecam
-//------------------------------------------------------------------------------
-
-// TODO: Per-player
-Vector fc_lastpos;
-Vector fc_lastvel;
-QAngle fc_lastang;
-
-void EnableFreecam(CBasePlayer *ply)
-{
-	fc_lastpos = ply->GetAbsOrigin();
-	fc_lastvel = ply->GetAbsVelocity();
-	fc_lastang = ply->GetAbsAngles();
-
-	
-	engine->ServerCommand("ai_disable");
-
-	ply->SetParent(NULL);
-	ply->SetRenderMode(kRenderNone);
-	
-	ply->ShowViewModel(false);
-
-	ply->SetMoveType(MOVETYPE_NOCLIP);
-
-	ClientPrint(ply, HUD_PRINTCONSOLE, "freecam ON\n");
-	ply->AddEFlags(EFL_NOCLIP_ACTIVE);
-	
-}
-
-void CC_Player_Freecam(void)
-{
-	if (!sv_cheats->GetBool())
-		return;
-
-	CBasePlayer *pPlayer = ToBasePlayer(UTIL_GetCommandClient());
-	if (!pPlayer)
-		return;
-
-	CPlayerState *pl = pPlayer->PlayerData();
-	Assert(pl);
-
-	if (pPlayer->GetMoveType() != MOVETYPE_NOCLIP)
-	{
-		EnableFreecam(pPlayer);
-		return;
-	}
-
-	pPlayer->SetAbsOrigin(fc_lastpos);
-	pPlayer->SetAbsVelocity(fc_lastvel);
-	pPlayer->SnapEyeAngles(fc_lastang);
-	
-	engine->ServerCommand("ai_disable");
-
-	pPlayer->SetRenderMode(kRenderNormal);
-	pPlayer->ShowViewModel(true);
-	pPlayer->SetMoveType(MOVETYPE_WALK);
-
-	pPlayer->RemoveEFlags(EFL_NOCLIP_ACTIVE);
-
-	ClientPrint(pPlayer, HUD_PRINTCONSOLE, "freecam OFF\n");
-}
-
-static ConCommand freecam("freecam", CC_Player_Freecam, "Toggle. Player becomes non-solid and flies.", FCVAR_CHEAT);
-
 
 //------------------------------------------------------------------------------
 // Noclip
@@ -1136,6 +1071,8 @@ void EnableNoClip( CBasePlayer *pPlayer )
 
 void CC_Player_NoClip( void )
 {
+// noclip is always enabled in editor
+#ifndef EDITOR_DLL
 	if ( !sv_cheats->GetBool() )
 		return;
 
@@ -1186,6 +1123,7 @@ void CC_Player_NoClip( void )
 
 		pPlayer->SetAbsOrigin( oldorigin );
 	}
+#endif
 }
 
 static ConCommand noclip("noclip", CC_Player_NoClip, "Toggle. Player becomes non-solid and flies.", FCVAR_CHEAT);

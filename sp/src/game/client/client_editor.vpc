@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"sdk2013ce"
+$Macro GAMENAME 	"editor"
 
 $Include "$SRCDIR\game\client\client_base.vpc"
 $Include "$SRCDIR\game\shared\shared_sdk2013CE.vpc"
@@ -15,7 +15,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	".\hl2;.\hl2\elements;$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\episodic;..\..\public;$BASE;$SRCDIR\game\shared\sdk2013ce;$SRCDIR\game\client\sdk2013ce;$SRCDIR\thirdparty"
-		$PreprocessorDefinitions		"$BASE;HL2_CLIENT_DLL;HL2_EPISODIC;SDK2013CE;SOURCE_2013;GLOWS_ENABLE"
+		$PreprocessorDefinitions		"$BASE;HL2_CLIENT_DLL;HL2_EPISODIC;EDITOR_DLL;SDK2013CE;SOURCE_2013;GLOWS_ENABLE"
 	}
 }
 
@@ -26,6 +26,12 @@ $Project "Client (Editor)"
 		$File	"hud_chat.cpp"
 		$File	"c_team_objectiveresource.cpp"
 		$File	"c_team_objectiveresource.h"
+		
+		$Folder "Editor"
+		{
+			$File	"$SRCDIR\game\server\editor\editor_gamerules.h"
+			$File	"$SRCDIR\game\server\editor\editor_gamerules.cpp"
+		}
 		
 		$Folder	"HL2 DLL"
 		{
@@ -96,8 +102,8 @@ $Project "Client (Editor)"
 			$File	"hl2\fx_hl2_impacts.cpp"
 			$File	"hl2\fx_hl2_tracers.cpp"
 			$File	"hl2\hl2_clientmode.cpp"
-			$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.cpp"
-			$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.h"
+			//$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.cpp"
+			//$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.h"
 			$File	"$SRCDIR\game\shared\hl2\hl2_shareddefs.h"
 			$File	"$SRCDIR\game\shared\hl2\hl2_usermessages.cpp"
 			$File	"$SRCDIR\game\shared\hl2\hl_gamemovement.cpp"

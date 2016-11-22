@@ -1,6 +1,6 @@
 #include "cbase.h"
 #include "hl2_player.h"
-#include "hl2_gamerules.h"
+#include "editor_gamerules.h"
 #include "gamerules.h"
 #include "teamplay_gamerules.h"
 #include "entitylist.h"
@@ -40,16 +40,14 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 	Assert( pPlayer );
 
 	if ( !pPlayer )
-	{
 		return;
-	}
 
 	pPlayer->InitialSpawn();
 
 	if ( !bLoadGame )
-	{
 		pPlayer->Spawn();
-	}
+	
+	pPlayer->SetMoveType(MOVETYPE_NOCLIP);
 }
 
 
@@ -65,7 +63,7 @@ const char *GetGameDescription()
 	if ( g_pGameRules ) // this function may be called before the world has spawned, and the game rules initialized
 		return g_pGameRules->GetGameDescription();
 	else
-		return "Half-Life 2";
+		return "Source CE Editor";
 }
 
 //-----------------------------------------------------------------------------
@@ -146,17 +144,7 @@ extern ConVar gamerules_survival;
 //=========================================================
 void InstallGameRules()
 {
-#ifdef HL2_EPISODIC
-	if ( gamerules_survival.GetBool() )
-	{
-		// Survival mode
-		CreateGameRulesObject( "CHalfLife2Survival" );
-	}
-	else
-#endif
-	{
-		// generic half-life
-		CreateGameRulesObject( "CHalfLife2" );
-	}
+	Msg("[Editor] Using editor game rules.");
+	CreateGameRulesObject( "CEditorRules" );
 }
 

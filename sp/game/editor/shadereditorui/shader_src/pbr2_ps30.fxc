@@ -1,0 +1,162 @@
+// ********************************
+// ** auto generated pixelshader **
+// ********************************
+
+#define SHADER_EDITOR_2013_COMPILE
+
+// Combos
+// DYNAMIC: "NUM_LIGHTS"		"0..4"
+
+// Includes
+#include "common_ps_fxc.h"
+#include "common_vertexlitgeneric_dx9.h"
+#include "common_lightmappedgeneric_fxc.h"
+#include "common_flashlight_fxc.h"
+#include "common_parallax.h"
+
+
+// Samplers
+sampler _Sampler_00		: register( s0 );
+sampler _Sampler_01		: register( s1 );
+sampler _Sampler_02		: register( s2 );
+sampler _Sampler_03		: register( s3 );
+sampler _Sampler_04		: register( s4 );
+
+// Constants
+const float2 g_cData_tiling		: register( c16 ); 		// Static
+const float3 g_cAmbientCube[6]		: register( c0 );
+PixelShaderLightInfo g_cLightInfo[3]		: register( c6 );
+
+// User code - globals
+
+
+//sampler smAO		: register( s4 );
+
+float Vis_SmithJointApprox( float Roughness, float NoV, float NoL )
+{
+	float a = Roughness * Roughness;
+	float Vis_SmithV = NoL * ( NoV * ( 1 - a ) + a );
+	float Vis_SmithL = NoV * ( NoL * ( 1 - a ) + a );
+	return 0.5 * (1 / (Vis_SmithV + Vis_SmithL) );
+}
+
+const static float PI = 3.1415926535897932f;
+
+float D_GGX( float Roughness, float NoH )
+{
+	float a = Roughness * Roughness;
+	float a2 = a * a;
+	float d = ( NoH * a2 - NoH ) * NoH + 1;	// 2 mad
+	return a2 / ( PI*d*d );					// 4 mul, 1 rcp
+}
+
+
+void SpecularVisTerm( in float3 WPos, in float3 WNormal, in float3 EyeToWorld, in float Roughness, out float Vis )
+{
+	float3 ViewDir = EyeToWorld * -1; // Make it World->Eye
+
+	Vis = 0;
+	
+	float3 LColor;
+	float3 LDir;
+
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		GetLightData(g_cLightInfo, i, WPos, LColor, LDir);
+
+		float NdotL = saturate(dot(WNormal, LDir * -1));
+		float NdotV = saturate(abs( dot(WNormal, ViewDir) ) + 1e-5 );
+		
+		Vis = Vis_SmithJointApprox(Roughness, NdotV, NdotL);
+	}
+	
+}
+
+
+void DistTerm( in float3 WPos, in float3 WNormal, in float3 EyeToWorld, in float Roughness, out float D )
+{
+	float3 ViewDir = EyeToWorld * -1; // Make it World->Eye
+
+	D = 0;
+	
+	float3 LColor;
+	float3 LDir;
+
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		GetLightData(g_cLightInfo, i, WPos, LColor, LDir);
+
+		//float3 H = normalize(ViewDir + LDir);
+		float3 H = normalize(LDir);
+		float NdotH = saturate(dot(WNormal, H));
+		
+		D = D_GGX(Roughness, NdotH);
+	}
+	
+}
+
+// User code - function bodies
+void GetPBR( in float2 UV, in float3 WNormal, in float3 WPos, in float4 VAttn, in float4 ProjPos, in float3 TanS, in float3 TanT, in float3 Eye2World, in float2 Tiling, in sampler smBaseTex, in sampler smNormalMap, in sampler smGloss, in sampler smRefl, in sampler smCubemap, out float4 Color )
+{
+	
+	float2 uvTiled = Tiling * UV;
+	float3x3 tangentSpace = { TanS, TanT, WNormal };
+	
+	//float3 world2Eye = In.vEye2World * float( -1.000000 );
+	float4 baseTex = tex2D( smBaseTex, uvTiled );
+	
+	float3 normal = normalize((tex2D( smNormalMap, uvTiled ).rgb * 2.0f) - 1.0f);
+	normal = mul( normal, tangentSpace);
+	normal = normalize( normal );
+	
+	float roughness = 1.0f - tex2D( smGloss, uvTiled ).r;
+	float reflTex = tex2D( smRefl, uvTiled ).r;
+	//float4 ao = tex2D( smAO, uvTiled ).rgba;
+	
+	
+	float3 diffuse = PixelShaderDoLighting( WPos, normal, float3(0,0,0), false, true, VAttn, g_cAmbientCube, NUM_LIGHTS, g_cLightInfo, false, false, 1.0f );
+			
+	float visTerm = (float)0;
+	SpecularVisTerm( WPos, normal, Eye2World, roughness, visTerm );
+	
+	float distTerm = (float)0;
+	DistTerm( WPos, normal, Eye2World, roughness, distTerm );
+	
+
+	float specular = visTerm * distTerm;
+	
+	float3 reflections = texCUBE( smCubemap, reflect( Eye2World, normal ) ).rgb;
+	reflections = reflections * ENV_MAP_SCALE;
+	reflections = reflTex * reflections;
+
+	float light = diffuse + (specular * reflections);
+	Color = float4( baseTex.rgb * light, baseTex.a );
+}
+
+// Semantic structures
+struct PS_INPUT
+{
+	float2 vTexCoord_0			:	TEXCOORD0;
+	float3 vTexCoord_1			:	TEXCOORD1;
+	float3 vTexCoord_2			:	TEXCOORD2;
+	float4 vTexCoord_3			:	TEXCOORD3;
+	float4 vTexCoord_4			:	TEXCOORD4;
+	float3 vTexCoord_5			:	TEXCOORD5;
+	float3 vTexCoord_6			:	TEXCOORD6;
+	float3 vTexCoord_7			:	TEXCOORD7;
+};
+
+struct PS_OUTPUT
+{
+	float4 vColor_0				:	COLOR0;
+};
+
+// Entry point
+PS_OUTPUT main( const PS_INPUT In )
+{
+	PS_OUTPUT Out;
+	float4 _var0 = (float4)0;
+	GetPBR( In.vTexCoord_0, In.vTexCoord_1, In.vTexCoord_2, In.vTexCoord_3, In.vTexCoord_4, In.vTexCoord_5, In.vTexCoord_6, In.vTexCoord_7, g_cData_tiling, _Sampler_00, _Sampler_01, _Sampler_02, _Sampler_03, _Sampler_04, _var0 );
+	Out.vColor_0 = _var0;
+	return Out;
+}

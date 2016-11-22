@@ -4,6 +4,9 @@ SetTransmitState(FL_EDICT_ALWAYS); //Entity will always render regardless of vis
 SetTransmitState(FL_EDICT_DONTSEND); //Entity will never render even when in view
 SetTransmitState(FL_EDICT_PVSCHECK); //Entity will always render if it passes a visleaf check
 -----------------------------------------------------------------------------------------------
+Usefull Console Commands:
+	dumpentityfactories - lists every entity name and classname
+-----------------------------------------------------------------------------------------------
 Panel List:
 
 	Engine Tools

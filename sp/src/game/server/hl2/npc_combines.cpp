@@ -21,7 +21,9 @@
 #include "Sprite.h"
 #include "soundenvelope.h"
 #include "weapon_physcannon.h"
+#ifndef EDITOR_DLL
 #include "hl2_gamerules.h"
+#endif
 #include "gameweaponmanager.h"
 #include "vehicle_base.h"
 
@@ -339,6 +341,8 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 			}
 		}
 
+// one of the few references to CHalfLife2
+#ifndef EDITOR_DLL
 		CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
 
 		// Attempt to drop health
@@ -357,6 +361,7 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 				pHL2GameRules->NPC_DroppedGrenade();
 			}
 		}
+#endif
 	}
 
 	BaseClass::Event_Killed( info );

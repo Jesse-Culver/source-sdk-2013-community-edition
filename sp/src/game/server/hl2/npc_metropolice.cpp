@@ -18,7 +18,9 @@
 #include "hl2_player.h"
 #include "iservervehicle.h"
 #include "items.h"
+#ifndef EDITOR_DLL
 #include "hl2_gamerules.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -3101,6 +3103,8 @@ void CNPC_MetroPolice::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( pPlayer != NULL )
 	{
+// one of the few references to CHalfLife2
+#ifndef EDITOR_DLL
 		CHalfLife2 *pHL2GameRules = static_cast<CHalfLife2 *>(g_pGameRules);
 
 		// Attempt to drop health
@@ -3109,6 +3113,7 @@ void CNPC_MetroPolice::Event_Killed( const CTakeDamageInfo &info )
 			DropItem( "item_healthvial", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
 			pHL2GameRules->NPC_DroppedHealth();
 		}
+#endif
 	}
 
 	BaseClass::Event_Killed( info );
