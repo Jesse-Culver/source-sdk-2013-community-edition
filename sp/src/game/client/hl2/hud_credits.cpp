@@ -34,7 +34,8 @@ struct creditname_t
 	int iSlot;
 };
 
-#define CREDITS_FILE "scripts/credits.txt"
+//#define CREDITS_FILE "scripts/credits.txt"
+ConVar cl_credits_file("cl_credits_file", "scripts/credits.txt", FCVAR_NONE, "The file to use when displaying credits.");
 
 enum
 {
@@ -141,7 +142,7 @@ void CHudCredits::PrepareCredits( const char *pKeyName )
 	Clear();
 
 	KeyValues *pKV= new KeyValues( "CreditsFile" );
-	if ( !pKV->LoadFromFile( filesystem, CREDITS_FILE, "MOD" ) )
+	if ( !pKV->LoadFromFile( filesystem, cl_credits_file.GetString(), "MOD" ) )
 	{
 		pKV->deleteThis();
 
