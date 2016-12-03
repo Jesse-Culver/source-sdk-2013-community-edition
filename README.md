@@ -4,7 +4,7 @@ This is a variation of Source 2013 with community changes to make the game look,
 
 If you want to use this mod in your own creations, add attribution to your mod (say that you used this branch and give a link to it). We recommend you use the GitHub client when downloading this because we update frequently.
 
-If you want to help contribute, message Wazanator on Steam or on Discord, or join our Discord server: https://discord.gg/FZqp7Cf
+If you want to help contribute, message Wazanator on Steam or on Discord, or join our Discord server: https://discord.gg/GYza458
 
 Alternatively, you can view proposed changes to be added via this link: https://docs.google.com/document/d/1yRjjMOtkjO590ApCdRn00wWshT9KKOYO0ESQIKBveOw/edit The latest suggestions and changes will always be found on Discord and GitHub
 
