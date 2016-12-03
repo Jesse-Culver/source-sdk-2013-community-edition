@@ -1071,8 +1071,6 @@ void EnableNoClip( CBasePlayer *pPlayer )
 
 void CC_Player_NoClip( void )
 {
-// noclip is always enabled in editor
-#ifndef EDITOR_DLL
 	if ( !sv_cheats->GetBool() )
 		return;
 
@@ -1123,7 +1121,6 @@ void CC_Player_NoClip( void )
 
 		pPlayer->SetAbsOrigin( oldorigin );
 	}
-#endif
 }
 
 static ConCommand noclip("noclip", CC_Player_NoClip, "Toggle. Player becomes non-solid and flies.", FCVAR_CHEAT);

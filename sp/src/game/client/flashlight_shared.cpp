@@ -43,8 +43,8 @@ ConVar r_flashlightdepthtexture( "r_flashlightdepthtexture", "1" );
  ConVar r_flashlightshadowatten( "r_flashlightshadowatten", "0.35", FCVAR_CHEAT );
  ConVar r_flashlightladderdist( "r_flashlightladderdist", "40.0", FCVAR_CHEAT );
 
- ConVar mat_slopescaledepthbias_shadowmap( "mat_slopescaledepthbias_shadowmap", "2", FCVAR_CHEAT | FCVAR_REPLICATED  );
- ConVar mat_depthbias_shadowmap(	"mat_depthbias_shadowmap", "0.00001", FCVAR_CHEAT | FCVAR_REPLICATED   );
+ ConVar mat_slopescaledepthbias_shadowmap( "mat_slopescaledepthbias_shadowmap", "2", FCVAR_CHEAT  );
+ ConVar mat_depthbias_shadowmap(	"mat_depthbias_shadowmap", "0.00001", FCVAR_CHEAT   );
 
  ConVar mat_shadow_filter("mat_shadow_filter", "0", FCVAR_CHEAT);
 

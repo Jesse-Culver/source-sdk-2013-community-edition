@@ -216,11 +216,8 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 	state.m_bEnableShadows = m_bEnableShadows;
 	state.m_pSpotlightTexture = materials->FindTexture( m_SpotlightTextureName, TEXTURE_GROUP_OTHER, false );
 	state.m_nSpotlightTextureFrame = m_nSpotlightTextureFrame;
-	// TODO: this doesn't seem to work all the time
 	state.m_flShadowFilterSize = mat_shadow_filter.GetFloat();
-	// TODO
-	//state.m_bDrawShadowFrustum = r_flashlightdrawfr
-	
+	state.m_bDrawShadowFrustum = r_flashlightdrawfrustum.GetBool();
 
 	state.m_nShadowQuality = m_nShadowQuality; // Allow entity to affect shadow quality
 

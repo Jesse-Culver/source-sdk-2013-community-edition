@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Server (Editor)</ProjectName>
+    <ProjectName>Editor (Server)</ProjectName>
     <ProjectGuid>{FA4B42AB-6B82-970A-56D7-C3A2BCA350C3}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -39,8 +39,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_sdk2013ce\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_sdk2013ce\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_editor\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug_editor\</IntDir>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.dll</TargetExt>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\devtools\vstools;$(ExecutablePath);$(Path)</ExecutablePath>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PreBuildEventUseInBuild>
@@ -48,8 +48,8 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
     <PostBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PostBuildEventUseInBuild>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_sdk2013ce\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_sdk2013ce\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_editor\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\Release_editor\</IntDir>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.dll</TargetExt>
     <ExecutablePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\devtools\vstools;$(ExecutablePath);$(Path)</ExecutablePath>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</PreBuildEventUseInBuild>
@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>if EXIST ..\..\..\game\sdk2013ce\bin\.\$(TargetFileName) for /f "delims=" %%A in ('attrib "..\..\..\game\sdk2013ce\bin\.\$(TargetFileName)"') do set valveTmpIsReadOnly="%%A"
+      <Command>if EXIST ..\..\..\game\editor\bin\.\$(TargetFileName) for /f "delims=" %%A in ('attrib "..\..\..\game\editor\bin\.\$(TargetFileName)"') do set valveTmpIsReadOnly="%%A"
 set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%
 if "%valveTmpIsReadOnlyLetter%"=="R" del /q "$(TargetDir)"$(TargetFileName)
 if exist "..\..\devtools\bin\vpc.exe" "..\..\devtools\bin\vpc.exe" -crc2 "server_editor.vcxproj"
@@ -70,8 +70,8 @@ if ERRORLEVEL 1 exit /b 1
     <ClCompile>
       <AdditionalOptions>/Zm200 /Gw</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\server\generated_proto_sdk2013ce;..\..\thirdparty\protobuf-2.3.0\src;.\;..\..\game\shared;..\..\utils\common;..\..\game\shared\econ;..\..\game\server\NextBot;..\..\game\shared\sdk2013ce;$(SolutionDir)\thirdparty;..\..\game\shared\hl2;..\..\game\shared\episodic;.\hl2;.\episodic;..\..\game\shared\sdk2013ce;..\..\game\server\sdk2013ce</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VPC;RAD_TELEMETRY_DISABLED;_HAS_ITERATOR_DEBUGGING=0;WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;%(PreprocessorDefinitions);COMPILER_MSVC32;COMPILER_MSVC32;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=server;BINK_VIDEO;AVI_VIDEO;WMV_VIDEO;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;fopen=dont_use_fopen;HL2_DLL;HL2_EPISODIC;USES_SAVERESTORE;SDK2013CE;GLOWS_ENABLE;_EXTERNAL_DLL_EXT=.dll;VPCGAMECAPS=VALVE;PROJECTDIR=C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\game\server;_DLL_EXT=.dll;SOURCE1=1;VPCGAME=valve</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\server\generated_proto_editor;..\..\thirdparty\protobuf-2.3.0\src;.\;..\..\game\shared;..\..\utils\common;..\..\game\shared\econ;..\..\game\server\NextBot;..\..\game\shared\sdk2013ce;$(SolutionDir)\thirdparty;..\..\game\shared\hl2;..\..\game\shared\episodic;.\hl2;.\episodic;..\..\game\server\sdk2013ce;$(ProjectDir)\editor</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>VPC;RAD_TELEMETRY_DISABLED;_HAS_ITERATOR_DEBUGGING=0;WIN32;_WIN32;_DEBUG;DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;%(PreprocessorDefinitions);COMPILER_MSVC32;COMPILER_MSVC32;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=server;BINK_VIDEO;AVI_VIDEO;WMV_VIDEO;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;fopen=dont_use_fopen;HL2_DLL;HL2_EPISODIC;EDITOR_DLL;USES_SAVERESTORE;SDK2013CE;GLOWS_ENABLE;_EXTERNAL_DLL_EXT=.dll;VPCGAMECAPS=VALVE;PROJECTDIR=C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\game\server;_DLL_EXT=.dll;SOURCE1=1;VPCGAME=valve</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -133,12 +133,12 @@ if ERRORLEVEL 1 exit /b 1
       <OutputFile>$(OutDir)/server.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Message>Publishing to ..\..\..\game\sdk2013ce\bin\.</Message>
-      <Command>if not exist "..\..\..\game\sdk2013ce\bin\." mkdir "..\..\..\game\sdk2013ce\bin\."
-copy "$(TargetDir)$(TargetFileName)" "..\..\..\game\sdk2013ce\bin\.\$(TargetFileName)"
+      <Message>Publishing to ..\..\..\game\editor\bin\.</Message>
+      <Command>if not exist "..\..\..\game\editor\bin\." mkdir "..\..\..\game\editor\bin\."
+copy "$(TargetDir)$(TargetFileName)" "..\..\..\game\editor\bin\.\$(TargetFileName)"
 if ERRORLEVEL 1 goto BuildEventFailed
-if exist "$(TargetDir)$(TargetName).map" copy "$(TargetDir)$(TargetName).map" ..\..\..\game\sdk2013ce\bin\.\$(TargetName).map
-copy "$(TargetDir)$(TargetName).pdb" ..\..\..\game\sdk2013ce\bin\.\$(TargetName).pdb
+if exist "$(TargetDir)$(TargetName).map" copy "$(TargetDir)$(TargetName).map" ..\..\..\game\editor\bin\.\$(TargetName).map
+copy "$(TargetDir)$(TargetName).pdb" ..\..\..\game\editor\bin\.\$(TargetName).pdb
 if ERRORLEVEL 1 goto BuildEventFailed
 goto BuildEventOK
 :BuildEventFailed
@@ -153,7 +153,7 @@ exit 1
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>if EXIST ..\..\..\game\sdk2013ce\bin\.\$(TargetFileName) for /f "delims=" %%A in ('attrib "..\..\..\game\sdk2013ce\bin\.\$(TargetFileName)"') do set valveTmpIsReadOnly="%%A"
+      <Command>if EXIST ..\..\..\game\editor\bin\.\$(TargetFileName) for /f "delims=" %%A in ('attrib "..\..\..\game\editor\bin\.\$(TargetFileName)"') do set valveTmpIsReadOnly="%%A"
 set valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%
 if "%valveTmpIsReadOnlyLetter%"=="R" del /q "$(TargetDir)"$(TargetFileName)
 if exist "..\..\devtools\bin\vpc.exe" "..\..\devtools\bin\vpc.exe" -crc2 "server_editor.vcxproj"
@@ -166,8 +166,8 @@ if ERRORLEVEL 1 exit /b 1
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\server\generated_proto_sdk2013ce;..\..\thirdparty\protobuf-2.3.0\src;.\;..\..\game\shared;..\..\utils\common;..\..\game\shared\econ;..\..\game\server\NextBot;..\..\game\shared\sdk2013ce;$(SolutionDir)\thirdparty;..\..\game\shared\hl2;..\..\game\shared\episodic;.\hl2;.\episodic;..\..\game\shared\sdk2013ce;..\..\game\server\sdk2013ce</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VPC;RAD_TELEMETRY_DISABLED;WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;%(PreprocessorDefinitions);COMPILER_MSVC32;COMPILER_MSVC32;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=server;BINK_VIDEO;AVI_VIDEO;WMV_VIDEO;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;fopen=dont_use_fopen;HL2_DLL;HL2_EPISODIC;USES_SAVERESTORE;SDK2013CE;GLOWS_ENABLE;_EXTERNAL_DLL_EXT=.dll;VPCGAMECAPS=VALVE;PROJECTDIR=C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\game\server;_DLL_EXT=.dll;SOURCE1=1;VPCGAME=valve</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\common;..\..\public;..\..\public\tier0;..\..\public\tier1;..\..\game\server\generated_proto_editor;..\..\thirdparty\protobuf-2.3.0\src;.\;..\..\game\shared;..\..\utils\common;..\..\game\shared\econ;..\..\game\server\NextBot;..\..\game\shared\sdk2013ce;$(SolutionDir)\thirdparty;..\..\game\shared\hl2;..\..\game\shared\episodic;.\hl2;.\episodic;..\..\game\shared\sdk2013ce;..\..\game\server\sdk2013ce</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>VPC;RAD_TELEMETRY_DISABLED;WIN32;_WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;_ALLOW_MSC_VER_MISMATCH;%(PreprocessorDefinitions);COMPILER_MSVC32;COMPILER_MSVC32;COMPILER_MSVC;_DLL_EXT=.dll;DLLNAME=server;BINK_VIDEO;AVI_VIDEO;WMV_VIDEO;DEV_BUILD;FRAME_POINTER_OMISSION_DISABLED;GAME_DLL;VECTOR;VERSION_SAFE_STEAM_API_INTERFACES;PROTECTED_THINGS_ENABLE;sprintf=use_Q_snprintf_instead_of_sprintf;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead;fopen=dont_use_fopen;HL2_DLL;HL2_EPISODIC;EDITOR_DLL;USES_SAVERESTORE;SDK2013CE;GLOWS_ENABLE;_EXTERNAL_DLL_EXT=.dll;VPCGAMECAPS=VALVE;PROJECTDIR=C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\game\server;_DLL_EXT=.dll;SOURCE1=1;VPCGAME=valve</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -231,12 +231,12 @@ if ERRORLEVEL 1 exit /b 1
       <OutputFile>$(OutDir)/server.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Message>Publishing to ..\..\..\game\sdk2013ce\bin\.</Message>
-      <Command>if not exist "..\..\..\game\sdk2013ce\bin\." mkdir "..\..\..\game\sdk2013ce\bin\."
-copy "$(TargetDir)$(TargetFileName)" "..\..\..\game\sdk2013ce\bin\.\$(TargetFileName)"
+      <Message>Publishing to ..\..\..\game\editor\bin\.</Message>
+      <Command>if not exist "..\..\..\game\editor\bin\." mkdir "..\..\..\game\editor\bin\."
+copy "$(TargetDir)$(TargetFileName)" "..\..\..\game\editor\bin\.\$(TargetFileName)"
 if ERRORLEVEL 1 goto BuildEventFailed
-if exist "$(TargetDir)$(TargetName).map" copy "$(TargetDir)$(TargetName).map" ..\..\..\game\sdk2013ce\bin\.\$(TargetName).map
-copy "$(TargetDir)$(TargetName).pdb" ..\..\..\game\sdk2013ce\bin\.\$(TargetName).pdb
+if exist "$(TargetDir)$(TargetName).map" copy "$(TargetDir)$(TargetName).map" ..\..\..\game\editor\bin\.\$(TargetName).map
+copy "$(TargetDir)$(TargetName).pdb" ..\..\..\game\editor\bin\.\$(TargetName).pdb
 if ERRORLEVEL 1 goto BuildEventFailed
 goto BuildEventOK
 :BuildEventFailed
@@ -308,6 +308,7 @@ exit 1
     <ClInclude Include="..\..\game\shared\entitydatainstantiator.h" />
     <ClInclude Include="..\..\game\shared\entitylist_base.h" />
     <ClInclude Include="..\..\game\shared\env_detail_controller.h" />
+    <ClInclude Include="editor\editor_gamerules.h" />
     <ClInclude Include="EventLog.h" />
     <ClInclude Include="..\..\game\shared\expressionsample.h" />
     <ClInclude Include="..\..\public\tier0\fasttimer.h" />
@@ -345,6 +346,11 @@ exit 1
     <ClInclude Include="..\..\public\ihltv.h" />
     <ClInclude Include="..\..\public\ihltvdirector.h" />
     <ClInclude Include="..\..\public\vstdlib\IKeyValuesSystem.h" />
+    <ClInclude Include="hl2\ai_behavior_police.h" />
+    <ClInclude Include="hl2\npc_combines.h" />
+    <ClInclude Include="hl2\npc_manhack.h" />
+    <ClInclude Include="hl2\npc_metropolice.h" />
+    <ClInclude Include="hl2\weapon_stunstick.h" />
     <ClInclude Include="ilagcompensationmanager.h" />
     <ClInclude Include="..\..\public\vgui\ILocalize.h" />
     <ClInclude Include="..\..\public\materialsystem\imaterial.h" />
@@ -753,7 +759,6 @@ exit 1
     <ClInclude Include="ai_behavior_passenger.h" />
     <ClInclude Include="episodic\ai_behavior_passenger_companion.h" />
     <ClInclude Include="episodic\ai_behavior_passenger_zombie.h" />
-    <ClInclude Include="hl2\ai_behavior_police.h" />
     <ClInclude Include="hl2\ai_goal_police.h" />
     <ClInclude Include="hl2\ai_interactions.h" />
     <ClInclude Include="hl2\ai_spotlight.h" />
@@ -778,7 +783,6 @@ exit 1
     <ClInclude Include="hl2\grenade_bugbait.h" />
     <ClInclude Include="hl2\grenade_frag.h" />
     <ClInclude Include="hl2\grenade_spit.h" />
-    <ClInclude Include="..\..\game\shared\hl2\hl2_gamerules.h" />
     <ClInclude Include="hl2\hl2_player.h" />
     <ClInclude Include="..\..\game\shared\hl2\hl2_player_shared.h" />
     <ClInclude Include="hl2\hl2_playerlocaldata.h" />
@@ -797,12 +801,9 @@ exit 1
     <ClInclude Include="hl2\npc_bullseye.h" />
     <ClInclude Include="hl2\npc_citizen17.h" />
     <ClInclude Include="hl2\npc_combine.h" />
-    <ClInclude Include="hl2\npc_combines.h" />
     <ClInclude Include="hl2\npc_crow.h" />
     <ClInclude Include="hl2\npc_headcrab.h" />
     <ClInclude Include="episodic\npc_hunter.h" />
-    <ClInclude Include="hl2\npc_manhack.h" />
-    <ClInclude Include="hl2\npc_metropolice.h" />
     <ClInclude Include="hl2\npc_playercompanion.h" />
     <ClInclude Include="hl2\npc_rollermine.h" />
     <ClInclude Include="hl2\npc_scanner.h" />
@@ -823,7 +824,6 @@ exit 1
     <ClInclude Include="hl2\weapon_physcannon.h" />
     <ClInclude Include="hl2\weapon_rpg.h" />
     <ClInclude Include="episodic\weapon_striderbuster.h" />
-    <ClInclude Include="hl2\weapon_stunstick.h" />
     <ClInclude Include="hl2\grenade_beam.h" />
     <ClInclude Include="hl2\grenade_homer.h" />
     <ClInclude Include="hl2\grenade_pathfollower.h" />
@@ -839,7 +839,7 @@ exit 1
     <ClInclude Include="toolframework_server.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="editor\editor_client.cpp" />
+    <ClCompile Include="editor\editor_gamerules.cpp" />
     <ClCompile Include="gamedll_replay.cpp" />
     <ClCompile Include="..\..\game\shared\achievement_saverestore.cpp" />
     <ClCompile Include="..\..\game\shared\achievementmgr.cpp" />
@@ -1058,6 +1058,11 @@ exit 1
     <ClCompile Include="globalstate.cpp" />
     <ClCompile Include="grenadethrown.cpp" />
     <ClCompile Include="guntarget.cpp" />
+    <ClCompile Include="hl2\ai_behavior_police.cpp" />
+    <ClCompile Include="hl2\npc_combines.cpp" />
+    <ClCompile Include="hl2\npc_manhack.cpp" />
+    <ClCompile Include="hl2\npc_metropolice.cpp" />
+    <ClCompile Include="hl2\weapon_stunstick.cpp" />
     <ClCompile Include="h_ai.cpp" />
     <ClCompile Include="h_cycler.cpp" />
     <ClCompile Include="h_export.cpp">
@@ -1251,7 +1256,6 @@ exit 1
     <ClCompile Include="..\..\game\shared\studio_shared.cpp" />
     <ClCompile Include="subs.cpp" />
     <ClCompile Include="sun.cpp" />
-    <ClCompile Include="..\..\game\shared\hl2\survival_gamerules.cpp" />
     <ClCompile Include="tactical_mission.cpp" />
     <ClCompile Include="..\..\game\shared\takedamageinfo.cpp" />
     <ClCompile Include="tanktrain.cpp" />
@@ -1289,6 +1293,7 @@ exit 1
     <ClCompile Include="..\..\game\shared\weapon_proficiency.cpp" />
     <ClCompile Include="weight_button.cpp" />
     <ClCompile Include="world.cpp" />
+    <ClCompile Include="editor\editor_client.cpp" />
     <ClCompile Include="..\..\game\shared\episodic\achievements_ep1.cpp" />
     <ClCompile Include="..\..\game\shared\episodic\achievements_ep2.cpp" />
     <ClCompile Include="..\..\game\shared\episodic\achievements_epx.cpp" />
@@ -1301,7 +1306,6 @@ exit 1
     <ClCompile Include="ai_behavior_passenger.cpp" />
     <ClCompile Include="episodic\ai_behavior_passenger_companion.cpp" />
     <ClCompile Include="episodic\ai_behavior_passenger_zombie.cpp" />
-    <ClCompile Include="hl2\ai_behavior_police.cpp" />
     <ClCompile Include="hl2\ai_goal_police.cpp" />
     <ClCompile Include="hl2\ai_spotlight.cpp" />
     <ClCompile Include="hl2\antlion_dust.cpp" />
@@ -1337,7 +1341,6 @@ exit 1
     <ClCompile Include="hl2\grenade_spit.cpp" />
     <ClCompile Include="hl2\hl2_ai_network.cpp" />
     <ClCompile Include="hl2\hl2_eventlog.cpp" />
-    <ClCompile Include="..\..\game\shared\hl2\hl2_gamerules.cpp" />
     <ClCompile Include="hl2\hl2_player.cpp" />
     <ClCompile Include="hl2\hl2_playerlocaldata.cpp" />
     <ClCompile Include="hl2\hl2_triggers.cpp" />
@@ -1373,7 +1376,6 @@ exit 1
     <ClCompile Include="hl2\npc_combinecamera.cpp" />
     <ClCompile Include="hl2\npc_combinedropship.cpp" />
     <ClCompile Include="hl2\npc_combinegunship.cpp" />
-    <ClCompile Include="hl2\npc_combines.cpp" />
     <ClCompile Include="hl2\npc_cranedriver.cpp" />
     <ClCompile Include="hl2\npc_crow.cpp" />
     <ClCompile Include="hl2\npc_dog.cpp" />
@@ -1388,8 +1390,6 @@ exit 1
     <ClCompile Include="hl2\npc_kleiner.cpp" />
     <ClCompile Include="hl2\npc_launcher.cpp" />
     <ClCompile Include="episodic\npc_magnusson.cpp" />
-    <ClCompile Include="hl2\npc_manhack.cpp" />
-    <ClCompile Include="hl2\npc_metropolice.cpp" />
     <ClCompile Include="hl2\npc_monk.cpp" />
     <ClCompile Include="hl2\npc_mossman.cpp" />
     <ClCompile Include="hl2\npc_playercompanion.cpp" />
@@ -1437,7 +1437,6 @@ exit 1
     <ClCompile Include="hl2\weapon_shotgun.cpp" />
     <ClCompile Include="hl2\weapon_smg1.cpp" />
     <ClCompile Include="episodic\weapon_striderbuster.cpp" />
-    <ClCompile Include="hl2\weapon_stunstick.cpp" />
     <ClCompile Include="hl2\grenade_beam.cpp" />
     <ClCompile Include="hl2\grenade_homer.cpp" />
     <ClCompile Include="hl2\grenade_pathfollower.cpp" />

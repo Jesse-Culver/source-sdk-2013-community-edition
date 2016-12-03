@@ -85,7 +85,7 @@ public:
 	bool	NPC_ShouldDropHealth(CBasePlayer *pRecipient);
 	void	NPC_DroppedHealth(void);
 	void	NPC_DroppedGrenade(void);
-	bool	MegaPhyscannonActive(void) { return m_bMegaPhysgun; }
+	bool	MegaPhyscannonActive(void) { return true; }
 
 	virtual bool FAllowNPCs(void) {return true;}
 
@@ -99,7 +99,7 @@ private:
 	void AdjustPlayerDamageTaken(CTakeDamageInfo *pInfo);
 	float AdjustPlayerDamageInflicted(float damage);
 
-	int						DefaultFOV(void) { return 75; }
+	int						DefaultFOV(void) { return 90; }
 #endif
 };
 

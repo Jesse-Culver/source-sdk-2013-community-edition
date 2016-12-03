@@ -41,6 +41,7 @@
 			// in folders where they don't exist.  (Searching a VPK is much faster than making an operating
 			// system call.)
 			//NOTE: Order does matter, things loaded first override things after
+			// todo: add sourceCE standard stuff
 			//game_lv			hl2/hl2_lv.vpk
 			//game+mod			ep2/ep2_english.vpk
 			game+mod			ep2/ep2_pak.vpk
@@ -60,7 +61,9 @@
 			
 			game				|all_source_engine_paths|episodic
 			game				|all_source_engine_paths|hl2
+			game				|gameinfo_path|..\sdk2013ce
 			platform			|all_source_engine_paths|platform
+			
 		}
 	}
 }

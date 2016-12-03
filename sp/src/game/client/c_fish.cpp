@@ -37,6 +37,8 @@ public:
 
 	virtual void OnDataChanged( DataUpdateType_t type );
 
+	virtual bool ShouldReceiveProjectedTextures(int flags) {return true;}
+
 private:
 	friend void RecvProxy_FishOriginX( const CRecvProxyData *pData, void *pStruct, void *pOut );
 	friend void RecvProxy_FishOriginY( const CRecvProxyData *pData, void *pStruct, void *pOut );

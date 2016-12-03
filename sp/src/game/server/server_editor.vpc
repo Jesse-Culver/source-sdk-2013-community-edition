@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 $Macro SRCDIR		"..\.."
-$Macro GAMENAME 	"sdk2013ce"
+$Macro GAMENAME 	"editor"
 
 $Include "$SRCDIR\game\server\server_base.vpc"
 $Include "$SRCDIR\game\shared\shared_sdk2013CE.vpc"
@@ -15,7 +15,7 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2;$SRCDIR\game\shared\episodic;.\hl2;.\episodic;$SRCDIR\game\shared\sdk2013ce;$SRCDIR\game\server\sdk2013ce"
-		$PreprocessorDefinitions		"$BASE;HL2_DLL;HL2_EPISODIC;USES_SAVERESTORE;SDK2013CE;GLOWS_ENABLE"
+		$PreprocessorDefinitions		"$BASE;HL2_DLL;HL2_EPISODIC;EDITOR_DLL;USES_SAVERESTORE;SDK2013CE;GLOWS_ENABLE"
 	}
 }
 
@@ -48,6 +48,11 @@ $Project "Server (Editor)"
 		$File	"$SRCDIR\game\shared\vehicle_choreo_generic_shared.h"
 		$File	"$SRCDIR\game\shared\weapon_parse_default.cpp"
 
+		$Folder "Editor"
+		{
+			$File	"editor\editor_client.cpp"
+		}
+		
 		$Folder	"HL2 DLL"
 		{
 			$File	"$SRCDIR\game\shared\episodic\achievements_ep1.cpp"
@@ -118,7 +123,7 @@ $Project "Server (Editor)"
 			$File	"hl2\grenade_spit.cpp"
 			$File	"hl2\grenade_spit.h"
 			$File	"hl2\hl2_ai_network.cpp"
-			$File	"hl2\hl2_client.cpp"
+			//$File	"hl2\hl2_client.cpp"
 			$File	"hl2\hl2_eventlog.cpp"
 			$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.cpp"
 			$File	"$SRCDIR\game\shared\hl2\hl2_gamerules.h"

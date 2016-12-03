@@ -130,11 +130,11 @@
 	input SetFOV(float)		: "Set FOV"
 ]
 
-@PointClass base(env_projectedtexture_base) = env_projectedtexture : ""
+@PointClass base(env_projectedtexture_base) frustum(lightfov,nearz,farz,lightcolor,-1) lightprop("models/editor/spot.mdl") = env_projectedtexture : ""
 [
 ]
 
-@PointClass base(env_projectedtexture_base) = light_dynamic : ""
+@PointClass base(env_projectedtexture_base) frustum(lightfov,nearz,farz,lightcolor,-1) lightprop("models/editor/spot.mdl") = light_dynamic : ""
 [
 ]
 
@@ -166,4 +166,8 @@
 @PointClass base(BasePropPhysics, RenderFields) studioprop() sphere(radius) = prop_sphere : "Creates a perfect sphere."
 [
 	radius(float) : "Radius" : 12 : ""
+]
+
+@PointClass sphere(1) = env_swarm : "env_swarm"
+[
 ]

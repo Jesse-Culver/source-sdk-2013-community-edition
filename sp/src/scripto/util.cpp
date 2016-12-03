@@ -28,5 +28,5 @@ void ScriptError(const char* msg, ...)
 
 	va_end(args);
 
-	_Msg(COLOR_RED, "[Script] %s\n", buf);
+	_Msg(COLOR_ORANGE, "[Script] %s\n", buf);
 }

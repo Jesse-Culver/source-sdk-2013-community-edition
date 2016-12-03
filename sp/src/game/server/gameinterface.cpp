@@ -791,6 +791,11 @@ void DrawAllDebugOverlays(void)
 		}
 	}
 
+#ifdef EDITOR_DLL
+	NDebugOverlay::ScreenText(0.f, 0.05f, "EDITOR", 255, 255, 255, 255, 0);
+	NDebugOverlay::ScreenText(0.f, 0.06f, "Press Shift+F1", 255, 255, 255, 255, 0);
+#endif
+
 	// A hack to draw point_message entities w/o developer required
 	DrawMessageEntities();
 }
@@ -1027,11 +1032,11 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #endif
 
 	// SourceCE Scripting (Lua)
-	Scripto_Init();
+	Scripto_Register();
 	// client and server should have their own CScriptManager
 	
 
-	g_scriptManager.CallHook("DLLInit");
+	//g_scriptManager.CallHook("DLLInit");
 	return true;
 }
 
@@ -1039,12 +1044,12 @@ void CServerGameDLL::PostInit()
 {
 	IGameSystem::PostInitAllSystems();
 
-	g_scriptManager.CallHook("PostInit");
+	//g_scriptManager.CallHook("PostInit");
 }
 
 void CServerGameDLL::DLLShutdown( void )
 {
-	g_scriptManager.CallHook("DLLShutdown");
+	//g_scriptManager.CallHook("DLLShutdown");
 
 	// Last in, first out
 	g_scriptManager.Terminate();
@@ -1150,7 +1155,7 @@ bool CServerGameDLL::GameInit( void )
 		gameeventmanager->FireEvent( event );
 
 
-	g_scriptManager.CallHook("GameInit");
+	//g_scriptManager.CallHook("GameInit");
 
 	return true;
 }
@@ -1162,7 +1167,7 @@ bool CServerGameDLL::GameInit( void )
 void CServerGameDLL::GameShutdown( void )
 {
 	ResetGlobalState();
-	g_scriptManager.CallHook("GameShutdown");
+	//g_scriptManager.CallHook("GameShutdown");
 }
 
 
@@ -1266,7 +1271,7 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	LoadMessageOfTheDay();
 
 	// Call Lua hook.
-	g_scriptManager.CallHook("LevelInit");
+	//g_scriptManager.CallHook("LevelInit");
 
 	// Sometimes an ent will Remove() itself during its precache, so RemoveImmediate won't happen.
 	// This makes sure those ents get cleaned up.
@@ -1529,7 +1534,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 void CServerGameDLL::Think( bool finalTick )
 {
 
-	g_scriptManager.CallHook("Think");
+	//g_scriptManager.CallHook("Think");
 	
 	if ( m_fAutoSaveDangerousTime != 0.0f && m_fAutoSaveDangerousTime < gpGlobals->curtime )
 	{
@@ -1587,7 +1592,7 @@ void CServerGameDLL::LevelShutdown( void )
 	g_nCurrentChapterIndex = -1;
 
 	// Call Lua hook.
-	g_scriptManager.CallHook("LevelShutdown");
+	//g_scriptManager.CallHook("LevelShutdown");
 
 #ifndef _XBOX
 #ifdef USE_NAV_MESH
@@ -2301,8 +2306,9 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 		return false;
 
 	// Pass args to game rules and scripting system.
-	return g_pGameRules->ClientConnected(pEdict, pszName, pszAddress, reject, maxrejectlen)
-		&& g_scriptManager.CallHook("ClientConnect", pEdict, pszName, pszAddress, reject, maxrejectlen);
+	return g_pGameRules->ClientConnected(pEdict, pszName, pszAddress, reject, maxrejectlen);
+			// TODO: script hook here
+		//&& g_scriptManager.CallHook("ClientConnect", pEdict, pszName, pszAddress, reject, maxrejectlen);
 }
 
 // Purpose: Called when a player is fully active (i.e. ready to receive messages)
@@ -2324,7 +2330,8 @@ void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 	}
 
 
-	g_scriptManager.CallHook("ClientActive", pEdict, bLoadGame);
+	// TODO: script hook here
+	//g_scriptManager.CallHook("ClientActive", pEdict, bLoadGame);
 
 	// Tell the sound controller to check looping sounds
 	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );

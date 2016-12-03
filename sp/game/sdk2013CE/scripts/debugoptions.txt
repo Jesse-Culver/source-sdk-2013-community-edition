@@ -207,6 +207,11 @@ DebugMenu
 		{
 			"togglecvar"	"r_drawwatersurface"
 		}
+		
+		"Shadows"
+		{
+			"togglecvar"	"r_shadows"
+		}
 	}
 
 	Physics

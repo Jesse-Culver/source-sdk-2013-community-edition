@@ -376,18 +376,18 @@ copy $(TargetDir)$(TargetName).lib ..\lib\public\$(TargetName).lib</Command>
     <Library Include="..\lib\public\vstdlib.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Array.h" />
     <ClInclude Include="cbase.h" />
     <ClInclude Include="IScriptingLanguage.h" />
+    <ClInclude Include="Languages\Lua\LuaLib.h" />
     <ClInclude Include="ScriptManager.h" />
     <ClInclude Include="scripto.h" />
+    <ClInclude Include="TaggedValue.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="Languages\Lua\LuaLanguage.h" />
-    <ClInclude Include="VM\VirtualMachine.h" />
-    <ClInclude Include="VM\VMInstruction.h" />
-    <ClInclude Include="VM\VMState.h" />
-    <ClInclude Include="VM\VMTypes.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Array.cpp" />
     <ClCompile Include="cbase.cpp" />
     <ClCompile Include="IScriptingLanguage.cpp" />
     <ClCompile Include="..\public\tier0\memoverride.cpp">
@@ -395,6 +395,7 @@ copy $(TargetDir)$(TargetName).lib ..\lib\public\$(TargetName).lib</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ScriptoTest|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Languages\Lua\LuaLib.cpp" />
     <ClCompile Include="ScriptManager.cpp" />
     <ClCompile Include="util.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -402,9 +403,6 @@ copy $(TargetDir)$(TargetName).lib ..\lib\public\$(TargetName).lib</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Languages\Lua\LuaLanguage.cpp" />
-    <ClCompile Include="VMTypes.cpp" />
-    <ClCompile Include="VM\VirtualMachine.cpp" />
-    <ClCompile Include="VM\VMState.cpp" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

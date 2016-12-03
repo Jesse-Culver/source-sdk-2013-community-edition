@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Client (Editor)</ProjectName>
+    <ProjectName>Editor (Client)</ProjectName>
     <ProjectGuid>{142AA1A9-A7C2-F6D1-6693-237D097256A1}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
