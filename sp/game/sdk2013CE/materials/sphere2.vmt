@@ -1,12 +1,10 @@
-"VertexLitGeneric"
+"Standard"
 {
 	$surfaceprop	"metal"
-	$basetexture	"pbr/metalgrime_color"
-	$bumpmap		"pbr/metalgrime_normal"
-	$phongtint		"[1 0 0]"
-	$phong			1
-	$phongexponent	10
-	$phongboost		5
-	$phongfresnelranges	"[0 0.5 1]"
+	$basetexture	"pbr/Tiles01_basecolor"
+	$bumpmap		"pbr/Tiles01_normal"
+	$specmap		"pbr/Tiles01_spec"
+	$gloss			0
+	
 	$halflambert	0
 }
