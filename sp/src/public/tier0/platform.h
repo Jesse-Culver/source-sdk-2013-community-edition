@@ -82,11 +82,14 @@
 // after confidence of xbox 1 code flush
 #define IsXbox()	false
 
+// Windows Based Systems
 #ifdef _WIN32
 	#define IsLinux() false
 	#define IsOSX() false
 	#define IsPosix() false
 	#define PLATFORM_WINDOWS 1 // Windows PC or Xbox 360
+	
+	// Windows PC
 	#ifndef _X360
 		#define IsWindows() true
 		#define IsPC() true
@@ -104,6 +107,7 @@
 			#define IsPlatformWindowsPC32() true
 			#define PLATFORM_WINDOWS_PC32 1
 		#endif
+	// XBOX 360
 	#else
 		#define PLATFORM_X360 1
 		#ifndef _CONSOLE
@@ -115,24 +119,29 @@
 		#define IsX360() true
 		#define IsPS3() false
 	#endif
+
 	// Adding IsPlatformOpenGL() to help fix a bunch of code that was using IsPosix() to infer if the DX->GL translation layer was being used.
 	#if defined( DX_TO_GL_ABSTRACTION )
 		#define IsPlatformOpenGL() true
 	#else
 		#define IsPlatformOpenGL() false
 	#endif
+
+// OSX and Linux
 #elif defined(POSIX)
 	#define IsPC() true
 	#define IsWindows() false
 	#define IsConsole() false
 	#define IsX360() false
 	#define IsPS3() false
+	// Linux
 	#if defined( LINUX )
 		#define IsLinux() true
 	#else
 		#define IsLinux() false
 	#endif
 	
+	// OSX
 	#if defined( OSX )
 		#define IsOSX() true
 	#else
@@ -285,6 +294,7 @@ typedef unsigned int		uint;
 #else
 #define abstract_class class NO_VTABLE
 #endif
+
 
 
 // MSVC CRT uses 0x7fff while gcc uses MAX_INT, leading to mismatches between platforms

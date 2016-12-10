@@ -1868,66 +1868,23 @@ void CServerGameDLL::InvalidateMdlCache()
 // used by TF2
 IServerGCLobby *CServerGameDLL::GetServerGCLobby()
 {
-#ifdef TF_DLL
-	return GTFGCClientSystem();
-#else	
 	return NULL;
-#endif
 }
 
 
 void CServerGameDLL::SetServerHibernation( bool bHibernating )
 {
 	m_bIsHibernating = bHibernating;
-
-	// somehow there is alien swarm code here
-#ifdef INFESTED_DLL
-	if ( engine && engine->IsDedicatedServer() && m_bIsHibernating && ASWGameRules() ) {
-		ASWGameRules()->OnServerHibernating();
-	}
-#endif
-
-#ifdef TF_DLL
-	GTFGCClientSystem()->SetHibernation( bHibernating );
-#endif
 }
 
 const char *CServerGameDLL::GetServerBrowserMapOverride()
 {
-#ifdef TF_DLL
-	if ( TFGameRules() && TFGameRules()->IsMannVsMachineMode() )
-	{
-		const char *pszFilenameShort = g_pPopulationManager ? g_pPopulationManager->GetPopulationFilenameShort() : NULL;
-		if ( pszFilenameShort && pszFilenameShort[0] )
-		{
-			return pszFilenameShort;
-		}
-	}
-#endif
 	return NULL;
 }
 
 const char *CServerGameDLL::GetServerBrowserGameData()
 {
 	CUtlString sResult;
-
-#ifdef TF_DLL
-	sResult.Format( "tf_mm_trusted:%d,tf_mm_servermode:%d", tf_mm_trusted.GetInt(), tf_mm_servermode.GetInt() );
-
-	CTFLobby *pLobby = GTFGCClientSystem()->GetLobby();
-	if ( pLobby == NULL )
-	{
-		sResult.Append( ",lobby:0" );
-	}
-	else
-	{
-		sResult.Append( CFmtStr( ",lobby:%016llx", pLobby->GetGroupID() ) );
-	}
-	if ( TFGameRules() && TFGameRules()->IsMannVsMachineMode() )
-	{
-		sResult.Append( CFmtStr( ",mannup:%d", ( pLobby && pLobby->GetPlayingForBraggingRights() ) ? 1 : 0  ) );
-	}
-#endif
 
 	static char rchResult[2048];
 	V_strcpy_safe( rchResult, sResult );

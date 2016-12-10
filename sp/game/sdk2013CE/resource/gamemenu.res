@@ -9,7 +9,7 @@
 	}
 	"5"	
 	{
-		"label" "#GameUI_GameMenu_NewGame"
+		"label" "LOAD MAP"
 		"command" "OpenNewGameDialog"
 		"InGameOrder" "40"
 		"notmulti" "1"

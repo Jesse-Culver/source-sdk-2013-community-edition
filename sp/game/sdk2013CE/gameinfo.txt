@@ -1,8 +1,10 @@
 "GameInfo"
 {
 	game 		"Source CE" //This is what is shown on Steam
-	title 		"Source SDK" //This is the main menu title
-	title2		"Community Edition" //This goes under title1 as a subtitle, e.g. Episode 2
+	//title 		"Source SDK" //This is the main menu title
+	title 		"" //This is the main menu title
+	//title2		"Community Edition" //This goes under title1 as a subtitle, e.g. Episode 2
+	title2		"" //This goes under title1 as a subtitle, e.g. Episode 2
 
 	type		singleplayer_only
 
@@ -57,7 +59,8 @@
 			//Example:    game    |all_source_engine_paths|cstrike/cstrike_pak.vpk
 
 			// Last, mount in shared HL2 loose files, not loading the episodic path causes issues!
-			
+
+			game				|all_source_engine_paths|ep2
 			game				|all_source_engine_paths|episodic
 			game				|all_source_engine_paths|hl2
 			platform			|all_source_engine_paths|platform

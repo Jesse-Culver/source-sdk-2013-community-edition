@@ -53,13 +53,13 @@ Scheme
 		"Main.Title1.X"				"50"
 		"Main.Title1.Y"				"145"
 		"Main.Title1.Y_hidef"		"130"
-		"Main.Title1.Color"	"15 15 15 200"
+		"Main.Title1.Color"	"255 255 255 255"
 
 		// Top-left corner of secondary title e.g. "DEMO" on the main screen
 		"Main.Title2.X"				"50"
 		"Main.Title2.Y"				"190"
 		"Main.Title2.Y_hidef"		"174"
-		"Main.Title2.Color"	"15 15 15 200"
+		"Main.Title2.Color"	"255 255 255 255"
 
 		// Top-left corner of the menu on the main screen
 		"Main.Menu.X"			"53"

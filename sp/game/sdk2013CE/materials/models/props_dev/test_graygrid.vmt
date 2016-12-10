@@ -1,6 +1,0 @@
-"Standard"
-{
-	$surfaceprop	"metal"
-	$basetexture	"pbr/metalgrime_color"
-	$bumpmap		"pbr/metalgrime_normal"
-}
