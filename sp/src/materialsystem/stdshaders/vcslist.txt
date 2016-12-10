@@ -1,0 +1,2 @@
+..\..\..\game\hl2\shaders\fxc\standard_vs30.vcs
+..\..\..\game\hl2\shaders\fxc\standard_ps30.vcs

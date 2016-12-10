@@ -12,7 +12,12 @@ $Project
 {
 	$Folder	"Source Files"
 	{
-		
+		$Folder "SourceCE"
+		{
+			$File	"$SRCDIR\game\shared\SourceCE\scripto.h"
+			$File	"$SRCDIR\game\shared\SourceCE\scripto.cpp"
+			//$File	"$SRCDIR\game\shared\SourceCE\"
+		}
 	}
 	
 	$Folder "Header Files"

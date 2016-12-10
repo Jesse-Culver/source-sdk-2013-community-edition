@@ -1,0 +1,14 @@
+"VertexLitGeneric"
+{
+	"$basetexture"	"Models/vehicle/jalopyTempColor"
+	"$bumpmap" "Models/vehicle/jalopyTemp_Normal"
+	"$surfaceprop"	"Wood_lowdensity"
+	//"$basealphaenvmapmask" 1
+	"$phong" "1"
+	"$phongboost" "5"
+	"$halflambert" "1"
+	"$phongexponent" "15"
+	//"$phongexponenttexture" "Models/vehicle/jalopyTempPhong"
+	//"$phongalbedotint" "1"										
+	"$phongfresnelranges"	"[.1 .5 1.0]"
+}

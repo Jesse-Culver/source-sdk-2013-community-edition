@@ -1,0 +1,117 @@
+
+// STATIC: "DIFFUSE"					"0..1"
+// STATIC: "SPECULAR"					"0..1"
+// STATIC: "FLASHLIGHT"					"0..1"
+// STATIC: "HALFLAMBERT"				"0..1"
+// STATIC: "GLOSS"						"0..1"
+
+// DYNAMIC: "NUM_LIGHTS"				"0..4"
+
+#include "common_vertexlitgeneric_dx9.h"
+#include "common_flashlight_fxc.h"
+#include "shader_constant_register_map.h"
+
+//const float4 g_DiffuseModulation	: register(c1);
+const float3 g_Tint					: register(c2);
+const float4 g_ShadowTweaks			: register(c2);
+const float3 cAmbientCube[6]		: register(c4);
+
+
+const float4 g_EyePos						: register(c11);
+const float4 g_FogParams					: register(c12);
+
+const float4 g_FlashlightAttenuationFactors	: register(c13); // On non-flashlight pass
+const float4 g_FlashlightPos_RimBoost		: register(c14);
+const float4x4 g_FlashlightWorldToTexture	: register(c15);
+
+// 2 registers each - 6 registers total (4th light spread across w's)
+PixelShaderLightInfo cLightInfo[3]			: register(c20);
+
+
+#define g_FlashlightPos					g_FlashlightPos_RimBoost.xyz
+
+sampler smBaseTexture			: register(s0);
+sampler smNormalMap				: register(s3);
+sampler smSpecMap				: register(s4);
+sampler smCubemap				: register(s5);
+
+
+//sampler NormalizeRandRotSampler	: register(s5); // Normalization / RandomRotation samplers
+//sampler FlashlightSampler		: register(s6); // Flashlight cookie
+
+#include "PBR.fxc"
+
+struct PS_INPUT
+{
+	float2 baseTexCoord	: TEXCOORD0;
+	float4 lightAtten	: TEXCOORD1;
+	float3 worldNormal	: TEXCOORD2;
+	float3 worldPos		: TEXCOORD3;
+	float3 projPos		: TEXCOORD4;
+	float4 worldTangent	: TEXCOORD5;
+};
+
+float4 main(PS_INPUT i) : COLOR
+{
+	float4 baseColor = tex2D(smBaseTexture, i.baseTexCoord);
+	float4 bumpMap = tex2D(smNormalMap, i.baseTexCoord);
+	float4 specMap = tex2D(smSpecMap, i.baseTexCoord);
+	
+	#if (GLOSS)
+		specMap.a = 1 - specMap.a;
+	#endif
+
+	float3 vWorldBinormal = cross(i.worldNormal.xyz, i.worldTangent.xyz) * i.worldTangent.w;
+	float3 tangentSpaceNormal = bumpMap * 2.0f - 1.0f;
+
+	float3 normal = normalize(Vec3TangentToWorld(bumpMap * 2.0f - 1.0f, i.worldNormal, i.worldTangent, vWorldBinormal));
+	
+	float3 diffuse = 0.0f;
+	float3 specular = 0.0f;
+
+	#if (!FLASHLIGHT)
+		
+		float3 LColor;
+		float3 LDir;
+		
+		[unroll]
+		for (uint j = 0; j < NUM_LIGHTS; j++)
+		{
+			LColor = PixelShaderGetLightColor(cLightInfo, j) * i.lightAtten[j];
+			LDir = PixelShaderGetLightVector(i.worldPos, cLightInfo, j);
+			
+			#if (DIFFUSE)
+				
+				float NdotL = dot(normal, LDir);
+				
+				#if (HALFLAMBERT)
+					NdotL = saturate(NdotL * 0.5 + 0.5);
+					diffuse += NdotL * NdotL * LColor;
+				#else
+					NdotL = saturate(NdotL);
+					diffuse += NdotL * LColor;
+				#endif
+				
+				
+			#endif
+			
+			#if (SPECULAR)
+				
+				//float3 H = normalize((g_EyePos - i.worldPos) + LDir);
+				float3 H = normalize(LDir);
+				float NdotH = saturate(dot(normal, H));
+				float D = D_GGX(specMap.a, NdotH) * i.lightAtten[j];
+				
+				specular += D * specMap.rgb * LColor;
+			
+				
+			#endif
+		}
+		
+	#endif
+	
+	
+	float3 result = baseColor.rgb * diffuse + specular;
+
+	return float4(result, baseColor.a);
+}

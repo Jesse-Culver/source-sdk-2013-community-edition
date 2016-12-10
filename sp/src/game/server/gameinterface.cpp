@@ -7,6 +7,7 @@
 //===========================================================================//
 
 #include "cbase.h"
+
 #include "gamestringpool.h"
 #include "mapentities_shared.h"
 #include "game.h"
@@ -89,55 +90,30 @@
 #include "tier3/tier3.h"
 #include "serverbenchmark_base.h"
 #include "querycache.h"
-
-#include "scripto/scripto.h"
-#include "scripto/lua.h"
-
-CScriptManager g_scriptManager;
-
-
-#ifdef TF_DLL
-#include "gc_clientsystem.h"
-#include "econ_item_inventory.h"
-#include "steamworks_gamestats.h"
-#include "tf/tf_gc_server.h"
-#include "tf_gamerules.h"
-#include "tf_lobby.h"
-#include "player_vs_environment/tf_population_manager.h"
-
-extern ConVar tf_mm_trusted;
-extern ConVar tf_mm_servermode;
-#endif
-
 #ifdef USE_NAV_MESH
 #include "nav_mesh.h"
 #endif
-
 #ifdef NEXT_BOT
 #include "NextBotManager.h"
 #endif
-
 #ifdef USES_ECON_ITEMS
 #include "econ_item_system.h"
 #endif // USES_ECON_ITEMS
-
-#ifdef CSTRIKE_DLL // BOTPORT: TODO: move these ifdefs out
-#include "bot/bot.h"
-#endif
-
-#ifdef PORTAL
-#include "prop_portal_shared.h"
-#include "portal_player.h"
-#endif
-
 #if defined( REPLAY_ENABLED )
 #include "replay/ireplaysystem.h"
 #endif
 
+#include "ai_network.h"
+
+#include "SourceCE/scripto.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
+#include "tier0/memdbgon.h"
+
 extern IToolFrameworkServer *g_pToolFrameworkServer;
 extern IParticleSystemQuery *g_pParticleSystemQuery;
 
-extern ConVar commentary;
+
 
 #ifndef NO_STEAM
 // this context is not available on dedicated servers
@@ -153,8 +129,7 @@ CSteamGameServerAPIContext *steamgameserverapicontext = &s_SteamGameServerAPICon
 
 IUploadGameStats *gamestatsuploader = NULL;
 
-// memdbgon must be the last include file in a .cpp file!!!
-#include "tier0/memdbgon.h"
+
 
 CTimedEventMgr g_NetworkPropertyEventMgr;
 
@@ -163,7 +138,12 @@ ISaveRestoreBlockHandler *GetCommentarySaveRestoreBlockHandler();
 
 CUtlLinkedList<CMapEntityRef, unsigned short> g_MapEntityRefs;
 
-// Engine interfaces.
+
+
+/************************************************************/
+#pragma region Engine Interfaces
+/************************************************************/
+
 IVEngineServer	*engine = NULL;
 IVoiceServer	*g_pVoiceServer = NULL;
 #if !defined(_STATIC_LINKED)
@@ -191,7 +171,6 @@ IMatchmaking *matchmaking = NULL;	// Xbox 360 only
 IReplaySystem *g_pReplay = NULL;
 IServerReplayContext *g_pReplayServerContext = NULL;
 #endif
-
 IGameSystem *SoundEmitterSystem();
 
 bool ModelSoundsCacheInit();
@@ -202,21 +181,48 @@ void SceneManager_ClientActive( CBasePlayer *player );
 class IMaterialSystem;
 class IStudioRender;
 
+#pragma endregion
+
+#pragma region Globals
+
+/************************************************************
+	ConVars
+************************************************************/
+
 #ifdef _DEBUG
-static ConVar s_UseNetworkVars( "UseNetworkVars", "1", FCVAR_CHEAT, "For profiling, toggle network vars." );
+static ConVar s_UseNetworkVars( "UseNetworkVars", "1", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "For profiling, toggle network vars." );
+static ConVar sv_showhitboxes("sv_showhitboxes", "-1", FCVAR_CHEAT, "Send server-side hitboxes for specified entity to client (NOTE:  this uses lots of bandwidth, use on listen server only).");
 #endif
 
+extern ConVar commentary;
 extern ConVar sv_noclipduringpause;
+
+// For now just using one big AI network
+extern ConVar think_limit;
+
+// keeps track of which chapters the user has unlocked
+ConVar sv_unlockedchapters("sv_unlockedchapters", "1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX);
+
+ConVar  trace_report("trace_report", "0");
 ConVar sv_massreport( "sv_massreport", "0" );
 ConVar sv_force_transmit_ents( "sv_force_transmit_ents", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Will transmit all entities to client, regardless of PVS conditions (will still skip based on transmit flags, however)." );
-
 ConVar sv_autosave( "sv_autosave", "1", 0, "Set to 1 to autosave game on level transition. Does not affect autosave triggers." );
+
+ConVar ai_post_frame_navigation("ai_post_frame_navigation", "0");
+
+static void ValidateMOTDFilename(IConVar *pConVar, const char *oldValue, float flOldValue);
+static ConVar motdfile("motdfile", "motd.txt", 0, "The MOTD file to load.", ValidateMOTDFilename);
+static ConVar motdfile_text("motdfile_text", "motd_text.txt", 0, "The text-only MOTD file to use for clients that have disabled HTML MOTDs.", ValidateMOTDFilename);
+
 ConVar *sv_maxreplay = NULL;
 static ConVar  *g_pcv_commentary = NULL;
 static ConVar *g_pcv_ThreadMode = NULL;
 static ConVar *g_pcv_hideServer = NULL;
 
-// String tables
+/************************************************************
+	String Tables
+************************************************************/
+
 INetworkStringTable *g_pStringTableParticleEffectNames = NULL;
 INetworkStringTable *g_pStringTableEffectDispatch = NULL;
 INetworkStringTable *g_pStringTableVguiScreen = NULL;
@@ -225,63 +231,82 @@ INetworkStringTable *g_pStringTableInfoPanel = NULL;
 INetworkStringTable *g_pStringTableClientSideChoreoScenes = NULL;
 INetworkStringTable *g_pStringTableServerMapCycle = NULL;
 
-#ifdef TF_DLL
-INetworkStringTable *g_pStringTableServerPopFiles = NULL;
-INetworkStringTable *g_pStringTableServerMapCycleMvM = NULL;
-#endif
-
 CStringTableSaveRestoreOps g_VguiScreenStringOps;
 
-// Holds global variables shared between engine and game.
-CGlobalVars *gpGlobals;
-edict_t *g_pDebugEdictBase = 0;
-static int		g_nCommandClientIndex = 0;
+/************************************************************
+	Globals (and Getters/Setters)
+************************************************************/
 
-// The chapter number of the current
-static int		g_nCurrentChapterIndex = -1;
+// globals shared between the engine and the game DLL
+CGlobalVars	*gpGlobals;
 
-#ifdef _DEBUG
-static ConVar sv_showhitboxes( "sv_showhitboxes", "-1", FCVAR_CHEAT, "Send server-side hitboxes for specified entity to client (NOTE:  this uses lots of bandwidth, use on listen server only)." );
-#endif
+CServerGameDLL g_ServerGameDLL;
+CServerGameClients g_ServerGameClients;
 
-void PrecachePointTemplates();
+edict_t		*g_pDebugEdictBase = 0;
 
-static ClientPutInServerOverrideFn g_pClientPutInServerOverride = NULL;
-static void UpdateChapterRestrictions( const char *mapname );
+static int	g_nCommandClientIndex = 0;
+static int	g_nCurrentChapterIndex = -1;
 
-static void UpdateRichPresence ( void );
-
+static ClientPutInServerOverrideFn	g_pClientPutInServerOverride = NULL;
+void ClientPutInServerOverride(ClientPutInServerOverrideFn fn) { g_pClientPutInServerOverride = fn; }
 
 #if !defined( _XBOX ) // Don't doubly define this symbol.
 CSharedEdictChangeInfo *g_pSharedChangeInfo = NULL;
-
 #endif
 
-IChangeInfoAccessor *CBaseEdict::GetChangeAccessor()
-{
-	return engine->GetChangeAccessor( (const edict_t *)this );
-}
+static bool g_OneWayTransition = false;
+void Game_SetOneWayTransition(void) {g_OneWayTransition = true;}
 
-const IChangeInfoAccessor *CBaseEdict::GetChangeAccessor() const
-{
-	return engine->GetChangeAccessor( (const edict_t *)this );
-}
+static CUtlVector<EHANDLE>	g_RestoredEntities;
+// just for debugging, assert that this is the only time this function is called
+static bool			g_InRestore = false;
 
-const char *GetHintTypeDescription( CAI_Hint *pHint );
+static bf_write		*g_pMsgBuffer = NULL;
 
-void ClientPutInServerOverride( ClientPutInServerOverrideFn fn )
-{
-	g_pClientPutInServerOverride = fn;
-}
+#pragma endregion
 
-ConVar ai_post_frame_navigation( "ai_post_frame_navigation", "0" );
+/************************************************************/
+#pragma region Functions
+/************************************************************/
+
+// from point_template.cpp
+void PrecachePointTemplates();
+
+// from ai_hint.cpp
+const char *GetHintTypeDescription(CAI_Hint *pHint);
+
 class CPostFrameNavigationHook;
-extern CPostFrameNavigationHook *PostFrameNavigationSystem( void );
+// from ai_basenpc.cpp
+extern CPostFrameNavigationHook *PostFrameNavigationSystem(void);
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
+// from game.cpp
+extern void InitializeCvars(void);
+
+// from player.cpp
+CBaseEntity*	FindPickerEntity(CBasePlayer* pPlayer);
+
+// from player.cpp
+CAI_Node*		FindPickerAINode(CBasePlayer* pPlayer, NodeType_e nNodeType);
+
+// from player.cpp
+CAI_Link*		FindPickerAILink(CBasePlayer* pPlayer);
+
+// from ai_node.cpp
+float			GetFloorZ(const Vector &origin);
+
+
+// from playerlocaldata.cpp
+void			UpdateAllClientData(void);
+
+// from message_entity.cpp
+void			DrawMessageEntities();
+
+/************************************************************
+	Function Bodies
+************************************************************/
+
+
 int UTIL_GetCommandClientIndex( void )
 {
 	// -1 == unknown,dedicated server console
@@ -291,26 +316,19 @@ int UTIL_GetCommandClientIndex( void )
 	return (g_nCommandClientIndex+1);
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : CBasePlayer
-//-----------------------------------------------------------------------------
+
 CBasePlayer *UTIL_GetCommandClient( void )
 {
 	int idx = UTIL_GetCommandClientIndex();
 	if ( idx > 0 )
-	{
 		return UTIL_PlayerByIndex( idx );
-	}
 
 	// HLDS console issued command
 	return NULL;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Retrieves the MOD directory for the active game (ie. "hl2")
-//-----------------------------------------------------------------------------
 
+// Retrieves the MOD directory for the active game (ie. "hl2")
 bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize )
 {
 	// Must pass in a buffer at least large enough to hold the desired string
@@ -333,21 +351,6 @@ bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize )
 	return true;
 }
 
-extern void InitializeCvars( void );
-
-CBaseEntity*	FindPickerEntity( CBasePlayer* pPlayer );
-CAI_Node*		FindPickerAINode( CBasePlayer* pPlayer, NodeType_e nNodeType );
-CAI_Link*		FindPickerAILink( CBasePlayer* pPlayer );
-float			GetFloorZ(const Vector &origin);
-void			UpdateAllClientData( void );
-void			DrawMessageEntities();
-
-#include "ai_network.h"
-
-// For now just using one big AI network
-extern ConVar think_limit;
-
-
 #if 0
 //-----------------------------------------------------------------------------
 // Purpose: Draw output overlays for any measure sections
@@ -359,19 +362,19 @@ void DrawMeasuredSections(void)
 	float	rowheight = 0.025;
 
 	CMeasureSection *p = CMeasureSection::GetList();
-	while ( p )
+	while (p)
 	{
 		char str[256];
-		Q_snprintf(str,sizeof(str),"%s",p->GetName());
-		NDebugOverlay::ScreenText( 0.01,0.51+(row*rowheight),str, 255,255,255,255, 0.0 );
-		
-		Q_snprintf(str,sizeof(str),"%5.2f\n",p->GetTime().GetMillisecondsF());
-		//Q_snprintf(str,sizeof(str),"%3.3f\n",p->GetTime().GetSeconds() * 100.0 / engine->Time());
-		NDebugOverlay::ScreenText( 0.28,0.51+(row*rowheight),str, 255,255,255,255, 0.0 );
+		Q_snprintf(str, sizeof(str), "%s", p->GetName());
+		NDebugOverlay::ScreenText(0.01, 0.51+(row*rowheight), str, 255, 255, 255, 255, 0.0);
 
-		Q_snprintf(str,sizeof(str),"%5.2f\n",p->GetMaxTime().GetMillisecondsF());
+		Q_snprintf(str, sizeof(str), "%5.2f\n", p->GetTime().GetMillisecondsF());
 		//Q_snprintf(str,sizeof(str),"%3.3f\n",p->GetTime().GetSeconds() * 100.0 / engine->Time());
-		NDebugOverlay::ScreenText( 0.34,0.51+(row*rowheight),str, 255,255,255,255, 0.0 );
+		NDebugOverlay::ScreenText(0.28, 0.51+(row*rowheight), str, 255, 255, 255, 255, 0.0);
+
+		Q_snprintf(str, sizeof(str), "%5.2f\n", p->GetMaxTime().GetMillisecondsF());
+		//Q_snprintf(str,sizeof(str),"%3.3f\n",p->GetTime().GetSeconds() * 100.0 / engine->Time());
+		NDebugOverlay::ScreenText(0.34, 0.51+(row*rowheight), str, 255, 255, 255, 255, 0.0);
 
 
 		row++;
@@ -382,8 +385,8 @@ void DrawMeasuredSections(void)
 	bool sort_reset = false;
 
 	// Time to redo sort?
-	if ( measure_resort.GetFloat() > 0.0 &&
-		engine->Time() >= CMeasureSection::m_dNextResort )
+	if (measure_resort.GetFloat() > 0.0 &&
+		engine->Time() >= CMeasureSection::m_dNextResort)
 	{
 		// Redo it
 		CMeasureSection::SortSections();
@@ -395,7 +398,7 @@ void DrawMeasuredSections(void)
 
 	// Iterate through the sections now
 	p = CMeasureSection::GetList();
-	while ( p )
+	while (p)
 	{
 		// Update max 
 		p->UpdateMax();
@@ -403,7 +406,7 @@ void DrawMeasuredSections(void)
 		// Reset regular accum.
 		p->Reset();
 		// Reset sort accum less often
-		if ( sort_reset )
+		if (sort_reset)
 		{
 			p->SortReset();
 		}
@@ -413,22 +416,256 @@ void DrawMeasuredSections(void)
 }
 #endif
 
-//-----------------------------------------------------------------------------
+void AddRestoredEntity(CBaseEntity *pEntity)
+{
+	Assert(g_InRestore);
+	if (!pEntity)
+		return;
+
+	g_RestoredEntities.AddToTail(EHANDLE(pEntity));
+}
+
+void EndRestoreEntities()
+{
+	if (!g_InRestore)
+		return;
+
+	// The entire hierarchy is restored, so we can call GetAbsOrigin again.
+	//CBaseEntity::SetAbsQueriesValid( true );
+
+	// Call all entities' OnRestore handlers
+	for (int i = g_RestoredEntities.Count()-1; i >=0; --i)
+	{
+		CBaseEntity *pEntity = g_RestoredEntities[i].Get();
+		if (pEntity && !pEntity->IsDormant())
+		{
+			MDLCACHE_CRITICAL_SECTION();
+			pEntity->OnRestore();
+		}
+	}
+
+	g_RestoredEntities.Purge();
+
+	IGameSystem::OnRestoreAllSystems();
+
+	g_InRestore = false;
+	gEntList.CleanupDeleteList();
+
+	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
+	g_ServerGameDLL.ServerActivate(NULL, 0, 0);
+	CBaseEntity::SetAllowPrecache(false);
+}
+
+void BeginRestoreEntities()
+{
+	if (g_InRestore)
+	{
+		DevMsg("BeginRestoreEntities without previous EndRestoreEntities.\n");
+		gEntList.CleanupDeleteList();
+	}
+	g_RestoredEntities.Purge();
+	g_InRestore = true;
+
+	CBaseEntity::SetAllowPrecache(true);
+
+	// No calls to GetAbsOrigin until the entire hierarchy is restored!
+	//CBaseEntity::SetAbsQueriesValid( false );
+}
+
+
+
+// Purpose: Updates which chapters are unlocked
+void UpdateChapterRestrictions(const char *mapname)
+{
+	// originally this would check from a hardcoded
+	// list of half-life chapter names and attempt
+	// to dynamically determine the appropriate value
+	// for sv_unlockedchapters in the stupidist possible way
+
+	sv_unlockedchapters.SetValue((sv_unlockedchapters.GetInt() + 1));
+}
+
+// Purpose: Update xbox live data for the user's presence
+void UpdateRichPresence(void)
+{
+	// This assumes we're playing a single player game
+	Assert(gpGlobals->maxClients == 1);
+
+	// Shouldn't get here unless we're playing a map and we've updated sv_unlockedchapters
+	Assert(g_nCurrentChapterIndex >= 0);
+
+	// Get our active mod directory name
+	char modDir[MAX_PATH];
+	if (UTIL_GetModDir(modDir, sizeof(modDir)) == false)
+		return;
+
+	// Get presence data based on the game we're playing
+	uint iGameID, iChapterIndex, iChapterID, iGamePresenceID;
+	iGameID = iChapterIndex = iChapterID = iGamePresenceID = 0;
+	if (Q_stristr(modDir, "hl2"))
+	{
+		iGameID			= CONTEXT_GAME_GAME_HALF_LIFE_2;
+		iChapterID		= CONTEXT_CHAPTER_HL2;
+		iChapterIndex	= g_nCurrentChapterIndex - 1;
+		iGamePresenceID = CONTEXT_PRESENCE_HL2_INGAME;
+	} else if (Q_stristr(modDir, "episodic"))
+	{
+		iGameID			= CONTEXT_GAME_GAME_EPISODE_ONE;
+		iChapterID		= CONTEXT_CHAPTER_EP1;
+		iChapterIndex	= g_nCurrentChapterIndex - 1;
+		iGamePresenceID = CONTEXT_PRESENCE_EP1_INGAME;
+	} else if (Q_stristr(modDir, "ep2"))
+	{
+		iGameID			= CONTEXT_GAME_GAME_EPISODE_TWO;
+		iChapterID		= CONTEXT_CHAPTER_EP2;
+		iChapterIndex	= g_nCurrentChapterIndex - 1;
+		iGamePresenceID = CONTEXT_PRESENCE_EP2_INGAME;
+	} else if (Q_stristr(modDir, "portal"))
+	{
+		iGameID			= CONTEXT_GAME_GAME_PORTAL;
+		iChapterID		= CONTEXT_CHAPTER_PORTAL;
+		iChapterIndex	= g_nCurrentChapterIndex - 1;
+		iGamePresenceID = CONTEXT_PRESENCE_PORTAL_INGAME;
+	} else
+	{
+		Warning("UpdateRichPresence failed in GameInterface. Didn't recognize -game parameter.");
+	}
+
+#if defined( _X360 )
+
+	// Set chapter context based on mapname
+	if (!xboxsystem->UserSetContext(XBX_GetPrimaryUserId(), iChapterID, iChapterIndex, true))
+	{
+		Warning("GameInterface: UserSetContext failed.\n");
+	}
+
+	if (commentary.GetBool())
+	{
+		// Set presence to show the user is playing developer commentary
+		if (!xboxsystem->UserSetContext(XBX_GetPrimaryUserId(), X_CONTEXT_PRESENCE, CONTEXT_PRESENCE_COMMENTARY, true))
+		{
+			Warning("GameInterface: UserSetContext failed.\n");
+		}
+	} else
+	{
+		// Set presence to show the user is in-game
+		if (!xboxsystem->UserSetContext(XBX_GetPrimaryUserId(), X_CONTEXT_PRESENCE, iGamePresenceID, true))
+		{
+			Warning("GameInterface: UserSetContext failed.\n");
+		}
+	}
+
+	// Set which game the user is playing
+	if (!xboxsystem->UserSetContext(XBX_GetPrimaryUserId(), CONTEXT_GAME, iGameID, true))
+	{
+		Warning("GameInterface: UserSetContext failed.\n");
+	}
+
+	if (!xboxsystem->UserSetContext(XBX_GetPrimaryUserId(), X_CONTEXT_GAME_TYPE, X_CONTEXT_GAME_TYPE_STANDARD, true))
+	{
+		Warning("GameInterface: UserSetContext failed.\n");
+	}
+
+	if (!xboxsystem->UserSetContext(XBX_GetPrimaryUserId(), X_CONTEXT_GAME_MODE, CONTEXT_GAME_MODE_SINGLEPLAYER, true))
+	{
+		Warning("GameInterface: UserSetContext failed.\n");
+	}
+#endif
+}
+
+// Precaches a vgui screen overlay material
+void PrecacheMaterial(const char *pMaterialName)
+{
+	Assert(pMaterialName && pMaterialName[0]);
+	g_pStringTableMaterials->AddString(CBaseEntity::IsServer(), pMaterialName);
+}
+
+
+// Converts a previously precached material into an index
+int GetMaterialIndex(const char *pMaterialName)
+{
+	if (pMaterialName)
+	{
+		int nIndex = g_pStringTableMaterials->FindStringIndex(pMaterialName);
+
+		if (nIndex != INVALID_STRING_INDEX)
+		{
+			return nIndex;
+		} else
+		{
+			DevMsg("Warning! GetMaterialIndex: couldn't find material %s\n ", pMaterialName);
+			return 0;
+		}
+	}
+
+	// This is the invalid string index
+	return 0;
+}
+
+// Converts a previously precached material index into a string
+const char *GetMaterialNameFromIndex(int nMaterialIndex)
+{
+	return g_pStringTableMaterials->GetString(nMaterialIndex);
+}
+
+
+// Precaches a vgui screen overlay material
+void PrecacheParticleSystem(const char *pParticleSystemName)
+{
+	Assert(pParticleSystemName && pParticleSystemName[0]);
+	g_pStringTableParticleEffectNames->AddString(CBaseEntity::IsServer(), pParticleSystemName);
+}
+
+
+// Converts a previously precached material into an index
+int GetParticleSystemIndex(const char *pParticleSystemName)
+{
+	if (pParticleSystemName)
+	{
+		int nIndex = g_pStringTableParticleEffectNames->FindStringIndex(pParticleSystemName);
+		if (nIndex != INVALID_STRING_INDEX)
+			return nIndex;
+
+		DevWarning("Server: Missing precache for particle system \"%s\"!\n", pParticleSystemName);
+	}
+
+	// This is the invalid string index
+	return 0;
+}
+
+
+// Converts a previously precached material index into a string
+const char *GetParticleSystemNameFromIndex(int nMaterialIndex)
+{
+	if (nMaterialIndex < g_pStringTableParticleEffectNames->GetMaxStrings())
+		return g_pStringTableParticleEffectNames->GetString(nMaterialIndex);
+	return "error";
+}
+
+// Returns true if host_thread_mode is set to non-zero (and engine is running in threaded mode)
+bool IsEngineThreaded()
+{
+	if (g_pcv_ThreadMode)
+	{
+		return g_pcv_ThreadMode->GetBool();
+	}
+	return false;
+}
+
 // Purpose: Draw debug overlays
-//-----------------------------------------------------------------------------
-void DrawAllDebugOverlays( void ) 
+void DrawAllDebugOverlays(void)
 {
 	// If in debug select mode print the selection entities name or classname
 	if (CBaseEntity::m_bInDebugSelect)
 	{
-		CBasePlayer* pPlayer =  UTIL_PlayerByIndex( CBaseEntity::m_nDebugPlayer );
+		CBasePlayer* pPlayer =  UTIL_PlayerByIndex(CBaseEntity::m_nDebugPlayer);
 
 		if (pPlayer)
 		{
 			// First try to trace a hull to an entity
-			CBaseEntity *pEntity = FindPickerEntity( pPlayer );
+			CBaseEntity *pEntity = FindPickerEntity(pPlayer);
 
-			if ( pEntity ) 
+			if (pEntity)
 			{
 				pEntity->DrawDebugTextOverlays();
 				pEntity->DrawBBoxOverlay();
@@ -447,8 +684,8 @@ void DrawAllDebugOverlays( void )
 	// ------------------------------------------------------------------------
 	if (engine->IsInEditMode())
 	{
-		CBasePlayer* pPlayer = UTIL_PlayerByIndex( CBaseEntity::m_nDebugPlayer );
-		if (pPlayer) 
+		CBasePlayer* pPlayer = UTIL_PlayerByIndex(CBaseEntity::m_nDebugPlayer);
+		if (pPlayer)
 		{
 			if (g_pAINetworkManager->GetEditOps()->m_bLinkEditMode)
 			{
@@ -459,44 +696,41 @@ void DrawAllDebugOverlays( void )
 					Vector startPos = g_pBigAINet->GetNode(pAILink->m_iSrcID)->GetPosition(g_pAINetworkManager->GetEditOps()->m_iHullDrawNum);
 					Vector endPos	= g_pBigAINet->GetNode(pAILink->m_iDestID)->GetPosition(g_pAINetworkManager->GetEditOps()->m_iHullDrawNum);
 					Vector linkDir	= startPos-endPos;
-					float linkLen = VectorNormalize( linkDir );
-					
+					float linkLen = VectorNormalize(linkDir);
+
 					// Draw in green if link that's been turned off
 					if (pAILink->m_LinkInfo & bits_LINK_OFF)
 					{
-						NDebugOverlay::BoxDirection(startPos, Vector(-4,-4,-4), Vector(-linkLen,4,4), linkDir, 0,255,0,40,0);
-					}
-					else
+						NDebugOverlay::BoxDirection(startPos, Vector(-4, -4, -4), Vector(-linkLen, 4, 4), linkDir, 0, 255, 0, 40, 0);
+					} else
 					{
-						NDebugOverlay::BoxDirection(startPos, Vector(-4,-4,-4), Vector(-linkLen,4,4), linkDir, 255,0,0,40,0);
+						NDebugOverlay::BoxDirection(startPos, Vector(-4, -4, -4), Vector(-linkLen, 4, 4), linkDir, 255, 0, 0, 40, 0);
 					}
 				}
-			}
-			else
+			} else
 			{
 				CAI_Node* pAINode;
 				if (g_pAINetworkManager->GetEditOps()->m_bAirEditMode)
 				{
-					pAINode = FindPickerAINode(pPlayer,NODE_AIR);
-				}
-				else
+					pAINode = FindPickerAINode(pPlayer, NODE_AIR);
+				} else
 				{
-					pAINode = FindPickerAINode(pPlayer,NODE_GROUND);
+					pAINode = FindPickerAINode(pPlayer, NODE_GROUND);
 				}
 
 				if (pAINode)
 				{
 					Vector vecPos = pAINode->GetPosition(g_pAINetworkManager->GetEditOps()->m_iHullDrawNum);
-					NDebugOverlay::Box( vecPos, Vector(-8,-8,-8), Vector(8,8,8), 255,0,0,40,0);
+					NDebugOverlay::Box(vecPos, Vector(-8, -8, -8), Vector(8, 8, 8), 255, 0, 0, 40, 0);
 
-					if ( pAINode->GetHint() )
+					if (pAINode->GetHint())
 					{
 						CBaseEntity *pEnt = (CBaseEntity *)pAINode->GetHint();
-						if ( pEnt->GetEntityName() != NULL_STRING )
+						if (pEnt->GetEntityName() != NULL_STRING)
 						{
-							NDebugOverlay::Text( vecPos + Vector(0,0,6), STRING(pEnt->GetEntityName()), false, 0 );
+							NDebugOverlay::Text(vecPos + Vector(0, 0, 6), STRING(pEnt->GetEntityName()), false, 0);
 						}
-						NDebugOverlay::Text( vecPos, GetHintTypeDescription( pAINode->GetHint() ), false, 0 );
+						NDebugOverlay::Text(vecPos, GetHintTypeDescription(pAINode->GetHint()), false, 0);
 					}
 				}
 			}
@@ -506,8 +740,7 @@ void DrawAllDebugOverlays( void )
 			if (g_pAINetworkManager->GetEditOps()->m_bAirEditMode)
 			{
 				UTIL_DrawPositioningOverlay(g_pAINetworkManager->GetEditOps()->m_flAirEditDistance);
-			}
-			else
+			} else
 			{
 				NDebugOverlay::DrawGroundCrossHairOverlay();
 			}
@@ -515,22 +748,22 @@ void DrawAllDebugOverlays( void )
 	}
 
 	// For not just using one big AI Network
-	if ( g_pAINetworkManager )
+	if (g_pAINetworkManager)
 	{
 		g_pAINetworkManager->GetEditOps()->DrawAINetworkOverlay();
 	}
 
 	// PERFORMANCE: only do this in developer mode
-	if ( g_pDeveloper->GetInt() && !engine->IsDedicatedServer() )
+	if (g_pDeveloper->GetInt() && !engine->IsDedicatedServer())
 	{
 		// iterate through all objects for debug overlays
 		const CEntInfo *pInfo = gEntList.FirstEntInfo();
 
-		for ( ;pInfo; pInfo = pInfo->m_pNext )
+		for (; pInfo; pInfo = pInfo->m_pNext)
 		{
 			CBaseEntity *ent = (CBaseEntity *)pInfo->m_pEntity;
 			// HACKHACK: to flag off these calls
-			if ( ent->m_debugOverlays || ent->m_pTimedOverlay )
+			if (ent->m_debugOverlays || ent->m_pTimedOverlay)
 			{
 				MDLCACHE_CRITICAL_SECTION();
 				ent->DrawDebugGeometryOverlays();
@@ -538,31 +771,90 @@ void DrawAllDebugOverlays( void )
 		}
 	}
 
-	if ( sv_massreport.GetInt() )
+	if (sv_massreport.GetInt())
 	{
 		// iterate through all objects for debug overlays
 		const CEntInfo *pInfo = gEntList.FirstEntInfo();
 
-		for ( ;pInfo; pInfo = pInfo->m_pNext )
+		for (; pInfo; pInfo = pInfo->m_pNext)
 		{
 			CBaseEntity *ent = (CBaseEntity *)pInfo->m_pEntity;
 			if (!ent->VPhysicsGetObject())
 				continue;
 
 			char tempstr[512];
-			Q_snprintf(tempstr, sizeof(tempstr),"%s: Mass: %.2f kg / %.2f lb (%s)", 
-				STRING( ent->GetModelName() ), ent->VPhysicsGetObject()->GetMass(), 
-				kg2lbs(ent->VPhysicsGetObject()->GetMass()), 
-				GetMassEquivalent(ent->VPhysicsGetObject()->GetMass()));
+			Q_snprintf(tempstr, sizeof(tempstr), "%s: Mass: %.2f kg / %.2f lb (%s)",
+					   STRING(ent->GetModelName()), ent->VPhysicsGetObject()->GetMass(),
+					   kg2lbs(ent->VPhysicsGetObject()->GetMass()),
+					   GetMassEquivalent(ent->VPhysicsGetObject()->GetMass()));
 			ent->EntityText(0, tempstr, 0);
 		}
 	}
+
+#ifdef EDITOR_DLL
+	NDebugOverlay::ScreenText(0.f, 0.05f, "EDITOR", 255, 255, 255, 255, 0);
+	NDebugOverlay::ScreenText(0.f, 0.06f, "Press Shift+F1", 255, 255, 255, 255, 0);
+#endif
 
 	// A hack to draw point_message entities w/o developer required
 	DrawMessageEntities();
 }
 
-CServerGameDLL g_ServerGameDLL;
+// CBaseEdict Crap
+IChangeInfoAccessor *CBaseEdict::GetChangeAccessor()
+{
+	return engine->GetChangeAccessor((const edict_t *)this);
+}
+const IChangeInfoAccessor *CBaseEdict::GetChangeAccessor() const
+{
+	return engine->GetChangeAccessor((const edict_t *)this);
+}
+
+#ifndef NO_STEAM
+CSteamID GetSteamIDForPlayerIndex(int iPlayerIndex)
+{
+	const CSteamID *pResult = engine->GetClientSteamIDByPlayerIndex(iPlayerIndex);
+	if (pResult)
+		return *pResult;
+
+	// Return a bogus steam ID
+	return CSteamID();
+}
+#endif
+
+// Purpose: Sanity-check to verify that a path is a relative path inside the game dir
+// Taken From: engine/cmd.cpp
+static bool IsValidPath(const char *pszFilename)
+{
+	if (!pszFilename)
+	{
+		return false;
+	}
+
+	if (Q_strlen(pszFilename) <= 0    ||
+		Q_IsAbsolutePath(pszFilename) || // to protect absolute paths
+		Q_strstr(pszFilename, ".."))    // to protect relative paths
+	{
+		return false;
+	}
+
+	return true;
+}
+
+static void ValidateMOTDFilename(IConVar *pConVar, const char *oldValue, float flOldValue)
+{
+	ConVarRef var(pConVar);
+	if (!IsValidPath(var.GetString()))
+		var.SetValue(var.GetDefault());
+}
+
+#pragma endregion
+
+
+
+#pragma region CServerGameDLL
+
+
 // INTERFACEVERSION_SERVERGAMEDLL_VERSION_8 is compatible with the latest since we're only adding things to the end, so expose that as well.
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameDLL, IServerGameDLL008, INTERFACEVERSION_SERVERGAMEDLL_VERSION_8, g_ServerGameDLL );
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameDLL, IServerGameDLL, INTERFACEVERSION_SERVERGAMEDLL, g_ServerGameDLL);
@@ -570,10 +862,13 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameDLL, IServerGameDLL, INTERFACEVERSI
 // When bumping the version to this interface, check that our assumption is still valid and expose the older version in the same way
 COMPILE_TIME_ASSERT( INTERFACEVERSION_SERVERGAMEDLL_INT == 9 );
 
+
+
 bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory, 
 		CreateInterfaceFn physicsFactory, CreateInterfaceFn fileSystemFactory, 
 		CGlobalVars *pGlobals)
 {
+	// connect tiered libaries
 	ConnectTier1Libraries( &appSystemFactory, 1 );
 	ConnectTier2Libraries( &appSystemFactory, 1 );
 	ConnectTier3Libraries( &appSystemFactory, 1 );
@@ -583,6 +878,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 		return false;
 
 #ifndef _X360
+	// setup steam systems
 	s_SteamAPIContext.Init();
 	s_SteamGameServerAPIContext.Init();
 #endif
@@ -629,14 +925,12 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( IsX360() && (matchmaking = (IMatchmaking *)appSystemFactory( VENGINE_MATCHMAKING_VERSION, NULL )) == NULL )
 		return false;
 
+#ifdef _WIN32
 	// If not running dedicated, grab the engine vgui interface
 	if ( !engine->IsDedicatedServer() )
-	{
-#ifdef _WIN32
 		// This interface is optional, and is only valid when running with -tools
 		serverenginetools = ( IServerEngineTools * )appSystemFactory( VSERVERENGINETOOLS_INTERFACE_VERSION, NULL );
 #endif
-	}
 
 	// Yes, both the client and game .dlls will try to Connect, the soundemittersystem.dll will handle this gracefully
 	if ( !soundemitterbase->Connect( appSystemFactory ) )
@@ -664,20 +958,19 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	
 	// Initialize the particle system
 	if ( !g_pParticleSystemMgr->Init( g_pParticleSystemQuery ) )
-	{
 		return false;
-	}
 
 	sv_cheats = g_pCVar->FindVar( "sv_cheats" );
 	if ( !sv_cheats )
 		return false;
 
-	g_pcv_commentary = g_pCVar->FindVar( "commentary" );
-	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
-	g_pcv_hideServer = g_pCVar->FindVar( "hide_server" );
+	// Init CVars
+	g_pcv_commentary =	g_pCVar->FindVar( "commentary" );
+	g_pcv_ThreadMode =	g_pCVar->FindVar( "host_thread_mode" );
+	g_pcv_hideServer =	g_pCVar->FindVar( "hide_server" );
+	sv_maxreplay =		g_pCVar->FindVar( "sv_maxreplay" );
 
-	sv_maxreplay = g_pCVar->FindVar( "sv_maxreplay" );
-
+	// Save-Restore Handlers
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetPhysSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetAISaveRestoreBlockHandler() );
@@ -687,15 +980,14 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetEventQueueSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetAchievementSaveRestoreBlockHandler() );
 
+	//// Game Systems ////
+
 	// The string system must init first + shutdown last
 	IGameSystem::Add( GameStringSystem() );
-
 	// Physics must occur before the sound envelope manager
 	IGameSystem::Add( PhysicsGameSystem() );
-	
 	// Used to service deferred navigation queries for NPCs
 	IGameSystem::Add( (IGameSystem *) PostFrameNavigationSystem() );
-
 	// Add game log system
 	IGameSystem::Add( GameLogSystem() );
 #ifndef _XBOX
@@ -707,17 +999,12 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 
 	// load Mod specific game events ( MUST be before InitAllSystems() so it can pickup the mod specific events)
 	gameeventmanager->LoadEventsFromFile("resource/ModEvents.res");
-
-#ifdef CSTRIKE_DLL // BOTPORT: TODO: move these ifdefs out
-	InstallBotControl();
-#endif
 	
 	if ( !IGameSystem::InitAllSystems() )
 		return false;
 
 #if defined( REPLAY_ENABLED )
-	if ( gameeventmanager->LoadEventsFromFile( "resource/replayevents.res" ) <= 0 )
-	{
+	if ( gameeventmanager->LoadEventsFromFile( "resource/replayevents.res" ) <= 0 ) {
 		Warning( "\n*\n* replayevents.res MISSING.\n*\n\n" );
 		return false;
 	}
@@ -725,9 +1012,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 
 	// Due to dependencies, these are not autogamesystems
 	if ( !ModelSoundsCacheInit() )
-	{
 		return false;
-	}
 
 	InvalidateQueryCache();
 
@@ -742,31 +1027,16 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// create the Navigation Mesh interface
 	TheNavMesh = NavMeshFactory();
 #endif
-
 	// init the gamestatsupload connection
 	gamestatsuploader->InitConnection();
 #endif
 
 	// SourceCE Scripting (Lua)
-
+	Scripto_Register();
 	// client and server should have their own CScriptManager
-	g_scriptManager.AddLanguage(new CLuaLanguage());
-
-	g_scriptManager.AddHook("DLLInit");
-	g_scriptManager.AddHook("PostInit");
-	g_scriptManager.AddHook("GameInit");
-	g_scriptManager.AddHook("LevelInit");
-
-	g_scriptManager.AddHook("ClientConnect");
-	g_scriptManager.AddHook("ClientActive");
 	
-	g_scriptManager.AddHook("GameShutdown");
-	g_scriptManager.AddHook("LevelShutdown");
-	g_scriptManager.AddHook("DLLShutdown");
 
-	
-	g_scriptManager.CallHook("DLLInit");
-
+	//g_scriptManager.CallHook("DLLInit");
 	return true;
 }
 
@@ -774,12 +1044,12 @@ void CServerGameDLL::PostInit()
 {
 	IGameSystem::PostInitAllSystems();
 
-	g_scriptManager.CallHook("PostInit");
+	//g_scriptManager.CallHook("PostInit");
 }
 
 void CServerGameDLL::DLLShutdown( void )
 {
-	g_scriptManager.CallHook("DLLShutdown");
+	//g_scriptManager.CallHook("DLLShutdown");
 
 	// Last in, first out
 	g_scriptManager.Terminate();
@@ -860,15 +1130,6 @@ float CServerGameDLL::GetTickInterval( void ) const
 {
 	float tickinterval = DEFAULT_TICK_INTERVAL;
 
-//=============================================================================
-// HPE_BEGIN:
-// [Forrest] For Counter-Strike, set default tick rate of 66 and removed -tickrate command line parameter.
-//=============================================================================
-// Ignoring this for now, server ops are abusing it
-#if !defined( TF_DLL ) && !defined( CSTRIKE_DLL ) && !defined( DOD_DLL )
-//=============================================================================
-// HPE_END
-//=============================================================================
 	// override if tick rate specified in command line
 	if ( CommandLine()->CheckParm( "-tickrate" ) )
 	{
@@ -876,10 +1137,10 @@ float CServerGameDLL::GetTickInterval( void ) const
 		if ( tickrate > 10 )
 			tickinterval = 1.0f / tickrate;
 	}
-#endif
 
 	return tickinterval;
 }
+
 
 // This is called when a new game is started. (restart, map)
 bool CServerGameDLL::GameInit( void )
@@ -891,98 +1152,31 @@ bool CServerGameDLL::GameInit( void )
 
 	IGameEvent *event = gameeventmanager->CreateEvent( "game_init" );
 	if ( event )
-	{
 		gameeventmanager->FireEvent( event );
-	}
 
-	g_scriptManager.CallHook("GameInit");
+
+	//g_scriptManager.CallHook("GameInit");
 
 	return true;
 }
+
+
 
 // This is called when a game ends (server disconnect, death, restart, load)
 // NOT on level transitions within a game
 void CServerGameDLL::GameShutdown( void )
 {
 	ResetGlobalState();
-	g_scriptManager.CallHook("GameShutdown");
+	//g_scriptManager.CallHook("GameShutdown");
 }
 
-static bool g_OneWayTransition = false;
-void Game_SetOneWayTransition( void )
-{
-	g_OneWayTransition = true;
-}
-
-static CUtlVector<EHANDLE> g_RestoredEntities;
-// just for debugging, assert that this is the only time this function is called
-static bool g_InRestore = false;
-
-void AddRestoredEntity( CBaseEntity *pEntity )
-{
-	Assert(g_InRestore);
-	if ( !pEntity )
-		return;
-
-	g_RestoredEntities.AddToTail( EHANDLE(pEntity) );
-}
-
-void EndRestoreEntities()
-{
-	if ( !g_InRestore )
-		return;
-		
-	// The entire hierarchy is restored, so we can call GetAbsOrigin again.
-	//CBaseEntity::SetAbsQueriesValid( true );
-
-	// Call all entities' OnRestore handlers
-	for ( int i = g_RestoredEntities.Count()-1; i >=0; --i )
-	{
-		CBaseEntity *pEntity = g_RestoredEntities[i].Get();
-		if ( pEntity && !pEntity->IsDormant() )
-		{
-			MDLCACHE_CRITICAL_SECTION();
-			pEntity->OnRestore();
-		}
-	}
-
-	g_RestoredEntities.Purge();
-
-	IGameSystem::OnRestoreAllSystems();
-
-	g_InRestore = false;
-	gEntList.CleanupDeleteList();
-
-	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
-	g_ServerGameDLL.ServerActivate( NULL, 0, 0 );
-	CBaseEntity::SetAllowPrecache( false );
-}
-
-void BeginRestoreEntities()
-{
-	if ( g_InRestore )
-	{
-		DevMsg( "BeginRestoreEntities without previous EndRestoreEntities.\n" );
-		gEntList.CleanupDeleteList();
-	}
-	g_RestoredEntities.Purge();
-	g_InRestore = true;
-
-	CBaseEntity::SetAllowPrecache( true );
-
-	// No calls to GetAbsOrigin until the entire hierarchy is restored!
-	//CBaseEntity::SetAbsQueriesValid( false );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: This prevents sv.tickcount/gpGlobals->tickcount from advancing during restore which
 //  would cause a lot of the NPCs to fast forward their think times to the same
 //  tick due to some ticks being elapsed during restore where there was no simulation going on
 //-----------------------------------------------------------------------------
-bool CServerGameDLL::IsRestoring()
-{
-	return g_InRestore;
-}
+bool CServerGameDLL::IsRestoring() { return g_InRestore;}
 
 // Called any time a new level is started (after GameInit() also on level transitions within a game)
 bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background )
@@ -1011,42 +1205,31 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 
 	// IGameSystem::LevelInitPreEntityAllSystems() is called when the world is precached
 	// That happens either in LoadGameState() or in MapEntity_ParseAllEntities()
-	if ( loadGame )
-	{
+	if ( loadGame ) {
+
 		if ( pOldLevel )
-		{
 			gpGlobals->eLoadType = MapLoad_Transition;
-		}
 		else
-		{
 			gpGlobals->eLoadType = MapLoad_LoadGame;
-		}
 
 		BeginRestoreEntities();
+
 		if ( !engine->LoadGameState( pMapName, 1 ) )
 		{
 			if ( pOldLevel )
-			{
 				MapEntity_ParseAllEntities( pMapEntities );
-			}
 			else
-			{
 				// Regular save load case
 				return false;
-			}
 		}
 
 		if ( pOldLevel )
-		{
 			engine->LoadAdjacentEnts( pOldLevel, pLandmarkName );
-		}
 
 		if ( g_OneWayTransition )
-		{
 			engine->ClearSaveDirAfterClientLoad();
-		}
 
-		if ( pOldLevel && sv_autosave.GetBool() == true )
+		if ( pOldLevel && sv_autosave.GetBool() )
 		{
 			// This is a single-player style level transition.
 			// Queue up an autosave one second into the level
@@ -1061,16 +1244,13 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	else
 	{
 		if ( background )
-		{
 			gpGlobals->eLoadType = MapLoad_Background;
-		}
 		else
-		{
 			gpGlobals->eLoadType = MapLoad_NewGame;
-		}
 
 		// Clear out entity references, and parse the entities into it.
 		g_MapEntityRefs.Purge();
+
 		CMapLoadEntityFilter filter;
 		MapEntity_ParseAllEntities( pMapEntities, &filter );
 
@@ -1091,7 +1271,7 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	LoadMessageOfTheDay();
 
 	// Call Lua hook.
-	g_scriptManager.CallHook("LevelInit");
+	//g_scriptManager.CallHook("LevelInit");
 
 	// Sometimes an ent will Remove() itself during its precache, so RemoveImmediate won't happen.
 	// This makes sure those ents get cleaned up.
@@ -1138,9 +1318,7 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 		return;
 
 	if ( gEntList.ResetDeleteList() != 0 )
-	{
-		Msg( "ERROR: Entity delete queue not empty on level start!\n" );
-	}
+		Error( "ERROR: Entity delete queue not empty on level start!\n" );
 
 	for ( CBaseEntity *pClass = gEntList.FirstEnt(); pClass != NULL; pClass = gEntList.NextEnt(pClass) )
 	{
@@ -1162,9 +1340,7 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 
 	// only display the think limit when the game is run with "developer" mode set
 	if ( !g_pDeveloper->GetInt() )
-	{
 		think_limit.SetValue( 0 );
-	}
 
 #ifndef _XBOX
 #ifdef USE_NAV_MESH
@@ -1174,18 +1350,12 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 #endif
 #endif
 
-#ifdef CSTRIKE_DLL // BOTPORT: TODO: move these ifdefs out
-	TheBots->ServerActivate();
-#endif
-
 #ifdef NEXT_BOT
 	TheNextBots().OnMapLoaded();
 #endif
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Called after the steam API has been activated post-level startup
-//-----------------------------------------------------------------------------
 void CServerGameDLL::GameServerSteamAPIActivated( void )
 {
 #ifndef NO_STEAM
@@ -1202,9 +1372,7 @@ void CServerGameDLL::GameServerSteamAPIActivated( void )
 #endif
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Called after the steam API has been activated post-level startup
-//-----------------------------------------------------------------------------
 void CServerGameDLL::GameServerSteamAPIShutdown( void )
 {
 #if !defined( NO_STEAM )
@@ -1218,11 +1386,9 @@ void CServerGameDLL::GameServerSteamAPIShutdown( void )
 #endif
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Called at the start of every game frame
-//-----------------------------------------------------------------------------
-ConVar  trace_report( "trace_report", "0" );
 
+
+// Purpose: Called at the start of every game frame
 void CServerGameDLL::GameFrame( bool simulating )
 {
 	VPROF( "CServerGameDLL::GameFrame" );
@@ -1234,8 +1400,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	if ( CBaseEntity::IsSimulatingOnAlternateTicks() )
 	{
 		// only run simulation on even numbered ticks
-		if ( gpGlobals->tickcount & 1 )
-		{
+		if ( gpGlobals->tickcount & 1 ) {
 			UpdateAllClientData();
 			return;
 		}
@@ -1259,6 +1424,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	gEntList.CleanupDeleteList();
 
 	IGameSystem::FrameUpdatePreEntityThinkAllSystems();
+
 	GameStartFrame();
 
 #ifndef _XBOX
@@ -1269,7 +1435,6 @@ void CServerGameDLL::GameFrame( bool simulating )
 #ifdef NEXT_BOT
 	TheNextBots().Update();
 #endif
-
 	gamestatsuploader->UpdateConnection();
 #endif
 
@@ -1291,9 +1456,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	UpdateAllClientData();
 
 	if ( g_pGameRules )
-	{
 		g_pGameRules->EndGameFrame();
-	}
 
 	if ( trace_report.GetBool() )
 	{
@@ -1302,15 +1465,11 @@ void CServerGameDLL::GameFrame( bool simulating )
 		{
 			totals[i] = enginetrace->GetStatByIndex( i, true );
 			if ( totals[i] > 0 )
-			{
 				total += totals[i];
-			}
 		}
 
 		if ( total )
-		{
 			Msg("Trace: %d, contents %d, enumerate %d\n", totals[0], totals[1], totals[2] );
-		}
 	}
 
 	// Any entities that detect network state changes on a timer do it here.
@@ -1359,9 +1518,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 			CBaseAnimating *anim = dynamic_cast< CBaseAnimating * >( pEntity );
 
 			if (anim)
-			{
 				anim->DrawServerHitboxes();
-			}
 		}
 		return;
 	}
@@ -1377,7 +1534,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 void CServerGameDLL::Think( bool finalTick )
 {
 
-	g_scriptManager.CallHook("Think");
+	//g_scriptManager.CallHook("Think");
 	
 	if ( m_fAutoSaveDangerousTime != 0.0f && m_fAutoSaveDangerousTime < gpGlobals->curtime )
 	{
@@ -1435,24 +1592,18 @@ void CServerGameDLL::LevelShutdown( void )
 	g_nCurrentChapterIndex = -1;
 
 	// Call Lua hook.
-	g_scriptManager.CallHook("LevelShutdown");
+	//g_scriptManager.CallHook("LevelShutdown");
 
 #ifndef _XBOX
 #ifdef USE_NAV_MESH
 	// reset the Navigation Mesh
 	if ( TheNavMesh )
-	{
 		TheNavMesh->Reset();
-	}
 #endif
 #endif
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : 
-// Output : ServerClass*
-//-----------------------------------------------------------------------------
+
 ServerClass* CServerGameDLL::GetAllServerClasses()
 {
 	return g_pServerClassHead;
@@ -1461,6 +1612,7 @@ ServerClass* CServerGameDLL::GetAllServerClasses()
 
 const char *CServerGameDLL::GetGameDescription( void )
 {
+	// game-specific code gets to handle this
 	return ::GetGameDescription();
 }
 
@@ -1476,17 +1628,8 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_pStringTableClientSideChoreoScenes = networkstringtable->CreateStringTable( "Scenes", MAX_CHOREO_SCENES_STRINGS );
 	g_pStringTableServerMapCycle = networkstringtable->CreateStringTable( "ServerMapCycle", 128 );
 
-#ifdef TF_DLL
-	g_pStringTableServerPopFiles = networkstringtable->CreateStringTable( "ServerPopFiles", 128 );
-	g_pStringTableServerMapCycleMvM = networkstringtable->CreateStringTable( "ServerMapCycleMvM", 128 );
-#endif
-
 	bool bPopFilesValid = true;
 	(void)bPopFilesValid; // Avoid unreferenced variable warning
-
-#ifdef TF_DLL
-	bPopFilesValid = ( g_pStringTableServerPopFiles != NULL );
-#endif
 
 	Assert( g_pStringTableParticleEffectNames &&
 			g_pStringTableEffectDispatch &&
@@ -1513,6 +1656,7 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 
 CSaveRestoreData *CServerGameDLL::SaveInit( int size )
 {
+	// saverestore.cpp gets to handle this
 	return ::SaveInit(size);
 }
 
@@ -1539,9 +1683,6 @@ void CServerGameDLL::SaveWriteFields( CSaveRestoreData *pSaveData, const char *p
 //			*pFields - pointer to an array of data field descriptions
 //			fieldCount - the size of the array (number of field descriptions)
 //-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-
 void CServerGameDLL::SaveReadFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {
 	CRestore restoreHelper( pSaveData );
@@ -1552,11 +1693,13 @@ void CServerGameDLL::SaveReadFields( CSaveRestoreData *pSaveData, const char *pn
 
 void CServerGameDLL::SaveGlobalState( CSaveRestoreData *s )
 {
+	// globalstate.cpp gets to handle this
 	::SaveGlobalState(s);
 }
 
 void CServerGameDLL::RestoreGlobalState(CSaveRestoreData *s)
 {
+	// globalstate.cpp gets to handle this
 	::RestoreGlobalState(s);
 }
 
@@ -1580,7 +1723,6 @@ void CServerGameDLL::Restore( CSaveRestoreData *s, bool b)
 //			size - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-
 bool CServerGameDLL::GetUserMessageInfo( int msg_type, char *name, int maxnamelength, int& size )
 {
 	if ( !usermessages->IsValidIndex( msg_type ) )
@@ -1622,151 +1764,6 @@ void CServerGameDLL::PreSave( CSaveRestoreData *s )
 
 #include "client_textmessage.h"
 
-// This little hack lets me marry BSP names to messages in titles.txt
-typedef struct
-{
-	const char *pBSPName;
-	const char *pTitleName;
-} TITLECOMMENT;
-
-// TODO: replace this big dumb hardcoded list with something better
-// this list gets searched for the first partial match, so some are out of order
-static TITLECOMMENT gTitleComments[] =
-{
-#ifdef HL1_DLL
-	{ "t0a0", "#T0A0TITLE" },
-	{ "c0a0", "#HL1_Chapter1_Title" },
-	{ "c1a0", "#HL1_Chapter2_Title" },
-	{ "c1a1", "#HL1_Chapter3_Title" },
-	{ "c1a2", "#HL1_Chapter4_Title" },
-	{ "c1a3", "#HL1_Chapter5_Title" },
-	{ "c1a4", "#HL1_Chapter6_Title" },
-	{ "c2a1", "#HL1_Chapter7_Title" },
-	{ "c2a2", "#HL1_Chapter8_Title" },
-	{ "c2a3", "#HL1_Chapter9_Title" },
-	{ "c2a4d", "#HL1_Chapter11_Title" },	// These must appear before "C2A4" so all other map names starting with C2A4 get that title
-	{ "c2a4e", "#HL1_Chapter11_Title" },
-	{ "c2a4f", "#HL1_Chapter11_Title" },
-	{ "c2a4g", "#HL1_Chapter11_Title" },
-	{ "c2a4", "#HL1_Chapter10_Title" },
-	{ "c2a5", "#HL1_Chapter12_Title" },
-	{ "c3a1", "#HL1_Chapter13_Title" },
-	{ "c3a2", "#HL1_Chapter14_Title" },
-	{ "c4a1a", "#HL1_Chapter17_Title"  },	// Order is important, see above
-	{ "c4a1b", "#HL1_Chapter17_Title"  },
-	{ "c4a1c", "#HL1_Chapter17_Title"  },
-	{ "c4a1d", "#HL1_Chapter17_Title"  },
-	{ "c4a1e", "#HL1_Chapter17_Title"  },
-	{ "c4a1", "#HL1_Chapter15_Title" },
-	{ "c4a2", "#HL1_Chapter16_Title"  },
-	{ "c4a3", "#HL1_Chapter18_Title"  },
-	{ "c5a1", "#HL1_Chapter19_Title"  },
-#elif defined PORTAL
-	{ "testchmb_a_00",			"#Portal_Chapter1_Title"  },
-	{ "testchmb_a_01",			"#Portal_Chapter1_Title"  },
-	{ "testchmb_a_02",			"#Portal_Chapter2_Title"  },
-	{ "testchmb_a_03",			"#Portal_Chapter2_Title"  },
-	{ "testchmb_a_04",			"#Portal_Chapter3_Title"  },
-	{ "testchmb_a_05",			"#Portal_Chapter3_Title"  },
-	{ "testchmb_a_06",			"#Portal_Chapter4_Title"  },
-	{ "testchmb_a_07",			"#Portal_Chapter4_Title"  },
-	{ "testchmb_a_08_advanced",	"#Portal_Chapter5_Title"  },
-	{ "testchmb_a_08",			"#Portal_Chapter5_Title"  },
-	{ "testchmb_a_09_advanced",	"#Portal_Chapter6_Title"  },
-	{ "testchmb_a_09",			"#Portal_Chapter6_Title"  },
-	{ "testchmb_a_10_advanced",	"#Portal_Chapter7_Title"  },
-	{ "testchmb_a_10",			"#Portal_Chapter7_Title"  },
-	{ "testchmb_a_11_advanced",	"#Portal_Chapter8_Title"  },
-	{ "testchmb_a_11",			"#Portal_Chapter8_Title"  },
-	{ "testchmb_a_13_advanced",	"#Portal_Chapter9_Title"  },
-	{ "testchmb_a_13",			"#Portal_Chapter9_Title"  },
-	{ "testchmb_a_14_advanced",	"#Portal_Chapter10_Title"  },
-	{ "testchmb_a_14",			"#Portal_Chapter10_Title"  },
-	{ "testchmb_a_15",			"#Portal_Chapter11_Title"  },
-	{ "escape_",				"#Portal_Chapter11_Title"  },
-	{ "background2",			"#Portal_Chapter12_Title"  },
-#else
-	{ "intro", "#HL2_Chapter1_Title" },
-
-	{ "d1_trainstation_05", "#HL2_Chapter2_Title" },
-	{ "d1_trainstation_06", "#HL2_Chapter2_Title" },
-	
-	{ "d1_trainstation_", "#HL2_Chapter1_Title" },
-
-	{ "d1_canals_06", "#HL2_Chapter4_Title" },
-	{ "d1_canals_07", "#HL2_Chapter4_Title" },
-	{ "d1_canals_08", "#HL2_Chapter4_Title" },
-	{ "d1_canals_09", "#HL2_Chapter4_Title" },
-	{ "d1_canals_1", "#HL2_Chapter4_Title" },
-	
-	{ "d1_canals_0", "#HL2_Chapter3_Title" },
-
-	{ "d1_eli_", "#HL2_Chapter5_Title" },
-
-	{ "d1_town_", "#HL2_Chapter6_Title" },
-
-	{ "d2_coast_09", "#HL2_Chapter8_Title" },
-	{ "d2_coast_1", "#HL2_Chapter8_Title" },
-	{ "d2_prison_01", "#HL2_Chapter8_Title" },
-
-	{ "d2_coast_", "#HL2_Chapter7_Title" },
-
-	{ "d2_prison_06", "#HL2_Chapter9a_Title" },
-	{ "d2_prison_07", "#HL2_Chapter9a_Title" },
-	{ "d2_prison_08", "#HL2_Chapter9a_Title" },
-
-	{ "d2_prison_", "#HL2_Chapter9_Title" },
-
-	{ "d3_c17_01", "#HL2_Chapter9a_Title" },
-	{ "d3_c17_09", "#HL2_Chapter11_Title" },
-	{ "d3_c17_1", "#HL2_Chapter11_Title" },
-
-	{ "d3_c17_", "#HL2_Chapter10_Title" },
-
-	{ "d3_citadel_", "#HL2_Chapter12_Title" },
-
-	{ "d3_breen_", "#HL2_Chapter13_Title" },
-	{ "credits", "#HL2_Chapter14_Title" },
-
-	{ "ep1_citadel_00", "#episodic_Chapter1_Title" },
-	{ "ep1_citadel_01", "#episodic_Chapter1_Title" },
-	{ "ep1_citadel_02b", "#episodic_Chapter1_Title" },
-	{ "ep1_citadel_02", "#episodic_Chapter1_Title" },
-	{ "ep1_citadel_03", "#episodic_Chapter2_Title" },
-	{ "ep1_citadel_04", "#episodic_Chapter2_Title" },
-	{ "ep1_c17_00a", "#episodic_Chapter3_Title" },
-	{ "ep1_c17_00", "#episodic_Chapter3_Title" },
-	{ "ep1_c17_01", "#episodic_Chapter4_Title" },
-	{ "ep1_c17_02b", "#episodic_Chapter4_Title" },
-	{ "ep1_c17_02", "#episodic_Chapter4_Title" },
-	{ "ep1_c17_05", "#episodic_Chapter5_Title" },
-	{ "ep1_c17_06", "#episodic_Chapter5_Title" },
-
-	{ "ep2_outland_01a", "#ep2_Chapter1_Title" },
-	{ "ep2_outland_01", "#ep2_Chapter1_Title" },
-	{ "ep2_outland_02", "#ep2_Chapter2_Title" },
-	{ "ep2_outland_03", "#ep2_Chapter2_Title" },
-	{ "ep2_outland_04", "#ep2_Chapter2_Title" },
-	{ "ep2_outland_05", "#ep2_Chapter3_Title" },
-	
-	{ "ep2_outland_06a", "#ep2_Chapter4_Title" },
-	{ "ep2_outland_06", "#ep2_Chapter3_Title" },
-
-	{ "ep2_outland_07", "#ep2_Chapter4_Title" },
-	{ "ep2_outland_08", "#ep2_Chapter4_Title" },
-	{ "ep2_outland_09", "#ep2_Chapter5_Title" },
-	
-	{ "ep2_outland_10a", "#ep2_Chapter5_Title" },
-	{ "ep2_outland_10", "#ep2_Chapter5_Title" },
-
-	{ "ep2_outland_11a", "#ep2_Chapter6_Title" },
-	{ "ep2_outland_11", "#ep2_Chapter6_Title" },
-	
-	{ "ep2_outland_12a", "#ep2_Chapter7_Title" },
-	{ "ep2_outland_12", "#ep2_Chapter6_Title" },
-#endif
-};
-
 #ifdef _XBOX
 void CServerGameDLL::GetTitleName( const char *pMapName, char* pTitleBuff, int titleBuffSize )
 {
@@ -1785,48 +1782,18 @@ void CServerGameDLL::GetTitleName( const char *pMapName, char* pTitleBuff, int t
 
 void CServerGameDLL::GetSaveComment( char *text, int maxlength, float flMinutes, float flSeconds, bool bNoTime )
 {
-	char comment[64];
 	const char	*pName;
-	int		i;
 
 	char const *mapname = STRING( gpGlobals->mapname );
 
 	pName = NULL;
-
-	// Try to find a matching title comment for this mapname
-	for ( i = 0; i < ARRAYSIZE(gTitleComments) && !pName; i++ )
-	{
-		if ( !Q_strnicmp( mapname, gTitleComments[i].pBSPName, strlen(gTitleComments[i].pBSPName) ) )
-		{
-			// found one
-			int j;
-
-			// Got a message, post-process it to be save name friendly
-			Q_strncpy( comment, gTitleComments[i].pTitleName, sizeof( comment ) );
-			pName = comment;
-			j = 0;
-			// Strip out CRs
-			while ( j < 64 && comment[j] )
-			{
-				if ( comment[j] == '\n' || comment[j] == '\r' )
-					comment[j] = 0;
-				else
-					j++;
-			}
-			break;
-		}
-	}
 	
 	// If we didn't get one, use the designer's map name, or the BSP name itself
 	if ( !pName )
-	{
 		pName = mapname;
-	}
 
 	if ( bNoTime )
-	{
 		Q_snprintf( text, maxlength, "%-64.64s", pName );
-	}
 	else
 	{
 		int minutes = flMinutes;
@@ -1881,16 +1848,9 @@ bool CServerGameDLL::ShouldHideServer( void )
 	if ( gpGlobals->eLoadType == MapLoad_Background )
 		return true;
 
-	#if defined( TF_DLL )
-		if ( GTFGCClientSystem()->ShouldHideServer() )
-			return true;
-	#endif
 	return false;
 }
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
 void CServerGameDLL::InvalidateMdlCache()
 {
 	CBaseAnimating *pAnimating;
@@ -1905,6 +1865,7 @@ void CServerGameDLL::InvalidateMdlCache()
 }
 
 // interface to the new GC based lobby system
+// used by TF2
 IServerGCLobby *CServerGameDLL::GetServerGCLobby()
 {
 #ifdef TF_DLL
@@ -1919,9 +1880,9 @@ void CServerGameDLL::SetServerHibernation( bool bHibernating )
 {
 	m_bIsHibernating = bHibernating;
 
+	// somehow there is alien swarm code here
 #ifdef INFESTED_DLL
-	if ( engine && engine->IsDedicatedServer() && m_bIsHibernating && ASWGameRules() )
-	{
+	if ( engine && engine->IsDedicatedServer() && m_bIsHibernating && ASWGameRules() ) {
 		ASWGameRules()->OnServerHibernating();
 	}
 #endif
@@ -1985,38 +1946,9 @@ void CServerGameDLL::BuildAdjacentMapList( void )
 		pSaveData->levelInfo.connectionCount = BuildChangeList( pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Sanity-check to verify that a path is a relative path inside the game dir
-// Taken From: engine/cmd.cpp
-//-----------------------------------------------------------------------------
-static bool IsValidPath( const char *pszFilename )
-{
-	if ( !pszFilename )
-	{
-		return false;
-	}
 
-	if ( Q_strlen( pszFilename ) <= 0    ||
-		 Q_IsAbsolutePath( pszFilename ) || // to protect absolute paths
-		 Q_strstr( pszFilename, ".." ) )    // to protect relative paths
-	{
-		return false;
-	}
 
-	return true;
-}
 
-static void ValidateMOTDFilename( IConVar *pConVar, const char *oldValue, float flOldValue )
-{
-	ConVarRef var( pConVar );
-	if ( !IsValidPath( var.GetString() ) )
-	{
-		var.SetValue( var.GetDefault() );
-	}
-}
-
-static ConVar motdfile( "motdfile", "motd.txt", 0, "The MOTD file to load.", ValidateMOTDFilename );
-static ConVar motdfile_text( "motdfile_text", "motd_text.txt", 0, "The text-only MOTD file to use for clients that have disabled HTML MOTDs.", ValidateMOTDFilename );
 void CServerGameDLL::LoadMessageOfTheDay()
 {
 	LoadSpecificMOTDMsg( motdfile, "motd" );
@@ -2081,288 +2013,9 @@ void CServerGameDLL::LoadSpecificMOTDMsg( const ConVar &convar, const char *pszS
 #endif
 }
 
-// keeps track of which chapters the user has unlocked
-ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX );
+#pragma endregion
 
-//-----------------------------------------------------------------------------
-// Purpose: Updates which chapters are unlocked
-//-----------------------------------------------------------------------------
-void UpdateChapterRestrictions( const char *mapname )
-{
-	// look at the chapter for this map
-	char chapterTitle[64];
-	chapterTitle[0] = 0;
-	for ( int i = 0; i < ARRAYSIZE(gTitleComments); i++ )
-	{
-		if ( !Q_strnicmp( mapname, gTitleComments[i].pBSPName, strlen(gTitleComments[i].pBSPName) ) )
-		{
-			// found
-			Q_strncpy( chapterTitle, gTitleComments[i].pTitleName, sizeof( chapterTitle ) );
-			int j = 0;
-			while ( j < 64 && chapterTitle[j] )
-			{
-				if ( chapterTitle[j] == '\n' || chapterTitle[j] == '\r' )
-					chapterTitle[j] = 0;
-				else
-					j++;
-			}
-
-			break;
-		}
-	}
-
-	if ( !chapterTitle[0] )
-		return;
-
-	// make sure the specified chapter title is unlocked
-	strlwr( chapterTitle );
-	
-	// Get our active mod directory name
-	char modDir[MAX_PATH];
-	if ( UTIL_GetModDir( modDir, sizeof(modDir) ) == false )
-		return;
-
-	char chapterNumberPrefix[64];
-	Q_snprintf(chapterNumberPrefix, sizeof(chapterNumberPrefix), "#%s_chapter", modDir);
-
-	const char *newChapterNumber = strstr( chapterTitle, chapterNumberPrefix );
-	if ( newChapterNumber )
-	{
-		// cut off the front
-		newChapterNumber += strlen( chapterNumberPrefix );
-		char newChapter[32];
-		Q_strncpy( newChapter, newChapterNumber, sizeof(newChapter) );
-
-		// cut off the end
-		char *end = strstr( newChapter, "_title" );
-		if ( end )
-		{
-			*end = 0;
-		}
-
-		int nNewChapter = atoi( newChapter );
-
-		// HACK: HL2 added a zany chapter "9a" which wreaks
-		//       havoc in this stupid atoi-based chapter code.
-		if ( !Q_stricmp( modDir, "hl2" ) )
-		{
-			if ( !Q_stricmp( newChapter, "9a" ) )
-			{
-				nNewChapter = 10;
-			}
-			else if ( nNewChapter > 9 )
-			{
-				nNewChapter++;
-			}
-		}
-
-		// ok we have the string, see if it's newer
-		const char *unlockedChapter = sv_unlockedchapters.GetString();
-		int nUnlockedChapter = atoi( unlockedChapter );
-
-		if ( nUnlockedChapter < nNewChapter )
-		{
-			// ok we're at a higher chapter, unlock
-			sv_unlockedchapters.SetValue( nNewChapter );
-
-			// HACK: Call up through a better function than this? 7/23/07 - jdw
-			if ( IsX360() )
-			{
-				engine->ServerCommand( "host_writeconfig\n" );
-			}
-		}
-
-		g_nCurrentChapterIndex = nNewChapter;
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Update xbox live data for the user's presence
-//-----------------------------------------------------------------------------
-void UpdateRichPresence ( void )
-{
-	// This assumes we're playing a single player game
-	Assert ( gpGlobals->maxClients == 1 );
-
-	// Shouldn't get here unless we're playing a map and we've updated sv_unlockedchapters
-	Assert ( g_nCurrentChapterIndex >= 0 );
-
-	// Get our active mod directory name
-	char modDir[MAX_PATH];
-	if ( UTIL_GetModDir( modDir, sizeof(modDir) ) == false )
-		return;
-
-	// Get presence data based on the game we're playing
-	uint iGameID, iChapterIndex, iChapterID, iGamePresenceID;
-	iGameID = iChapterIndex = iChapterID = iGamePresenceID = 0;
-	if ( Q_stristr( modDir, "hl2" ) )
-	{
-		iGameID			= CONTEXT_GAME_GAME_HALF_LIFE_2;
-		iChapterID		= CONTEXT_CHAPTER_HL2;
-		iChapterIndex	= g_nCurrentChapterIndex - 1;
-		iGamePresenceID = CONTEXT_PRESENCE_HL2_INGAME;
-	}
-	else if ( Q_stristr( modDir, "episodic" ) )
-	{
-		iGameID			= CONTEXT_GAME_GAME_EPISODE_ONE;
-		iChapterID		= CONTEXT_CHAPTER_EP1;
-		iChapterIndex	= g_nCurrentChapterIndex - 1;
-		iGamePresenceID = CONTEXT_PRESENCE_EP1_INGAME;
-	}
-	else if ( Q_stristr( modDir, "ep2" ) )
-	{
-		iGameID			= CONTEXT_GAME_GAME_EPISODE_TWO;
-		iChapterID		= CONTEXT_CHAPTER_EP2;
-		iChapterIndex	= g_nCurrentChapterIndex - 1;
-		iGamePresenceID = CONTEXT_PRESENCE_EP2_INGAME;
-	}
-	else if ( Q_stristr( modDir, "portal" ) )
-	{
-		iGameID			= CONTEXT_GAME_GAME_PORTAL;
-		iChapterID		= CONTEXT_CHAPTER_PORTAL;
-		iChapterIndex	= g_nCurrentChapterIndex - 1;
-		iGamePresenceID = CONTEXT_PRESENCE_PORTAL_INGAME;
-	}
-	else
-	{
-		Warning( "UpdateRichPresence failed in GameInterface. Didn't recognize -game parameter." );
-	}
-
-#if defined( _X360 )
-
-	// Set chapter context based on mapname
-	if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), iChapterID, iChapterIndex, true ) )
-	{
-		Warning( "GameInterface: UserSetContext failed.\n" );
-	}
-
-	if ( commentary.GetBool() )
-	{
-		// Set presence to show the user is playing developer commentary
-		if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_PRESENCE, CONTEXT_PRESENCE_COMMENTARY, true ) )
-		{
-			Warning( "GameInterface: UserSetContext failed.\n" );
-		}
-	}
-	else
-	{
-		// Set presence to show the user is in-game
-		if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_PRESENCE, iGamePresenceID, true ) )
-		{
-			Warning( "GameInterface: UserSetContext failed.\n" );
-		}
-	}
-	
-	// Set which game the user is playing
-	if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), CONTEXT_GAME, iGameID, true ) )
-	{
-		Warning( "GameInterface: UserSetContext failed.\n" );
-	}
-
-	if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_GAME_TYPE, X_CONTEXT_GAME_TYPE_STANDARD, true ) )
-	{
-		Warning( "GameInterface: UserSetContext failed.\n" );
-	}
-
-	if ( !xboxsystem->UserSetContext( XBX_GetPrimaryUserId(), X_CONTEXT_GAME_MODE, CONTEXT_GAME_MODE_SINGLEPLAYER, true ) )
-	{
-		Warning( "GameInterface: UserSetContext failed.\n" );
-	}
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// Precaches a vgui screen overlay material
-//-----------------------------------------------------------------------------
-void PrecacheMaterial( const char *pMaterialName )
-{
-	Assert( pMaterialName && pMaterialName[0] );
-	g_pStringTableMaterials->AddString( CBaseEntity::IsServer(), pMaterialName );
-}
-
-
-//-----------------------------------------------------------------------------
-// Converts a previously precached material into an index
-//-----------------------------------------------------------------------------
-int GetMaterialIndex( const char *pMaterialName )
-{
-	if (pMaterialName)
-	{
-		int nIndex = g_pStringTableMaterials->FindStringIndex( pMaterialName );
-		
-		if (nIndex != INVALID_STRING_INDEX )
-		{
-			return nIndex;
-		}
-		else
-		{
-			DevMsg("Warning! GetMaterialIndex: couldn't find material %s\n ", pMaterialName );
-			return 0;
-		}
-	}
-
-	// This is the invalid string index
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-// Converts a previously precached material index into a string
-//-----------------------------------------------------------------------------
-const char *GetMaterialNameFromIndex( int nMaterialIndex )
-{
-	return g_pStringTableMaterials->GetString( nMaterialIndex );
-}
-
-
-//-----------------------------------------------------------------------------
-// Precaches a vgui screen overlay material
-//-----------------------------------------------------------------------------
-void PrecacheParticleSystem( const char *pParticleSystemName )
-{
-	Assert( pParticleSystemName && pParticleSystemName[0] );
-	g_pStringTableParticleEffectNames->AddString( CBaseEntity::IsServer(), pParticleSystemName );
-}
-
-
-//-----------------------------------------------------------------------------
-// Converts a previously precached material into an index
-//-----------------------------------------------------------------------------
-int GetParticleSystemIndex( const char *pParticleSystemName )
-{
-	if ( pParticleSystemName )
-	{
-		int nIndex = g_pStringTableParticleEffectNames->FindStringIndex( pParticleSystemName );
-		if (nIndex != INVALID_STRING_INDEX )
-			return nIndex;
-
-		DevWarning("Server: Missing precache for particle system \"%s\"!\n", pParticleSystemName );
-	}
-
-	// This is the invalid string index
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-// Converts a previously precached material index into a string
-//-----------------------------------------------------------------------------
-const char *GetParticleSystemNameFromIndex( int nMaterialIndex )
-{
-	if ( nMaterialIndex < g_pStringTableParticleEffectNames->GetMaxStrings() )
-		return g_pStringTableParticleEffectNames->GetString( nMaterialIndex );
-	return "error";
-}
-
-//-----------------------------------------------------------------------------
-// Returns true if host_thread_mode is set to non-zero (and engine is running in threaded mode)
-//-----------------------------------------------------------------------------
-bool IsEngineThreaded()
-{
-	if ( g_pcv_ThreadMode )
-	{
-		return g_pcv_ThreadMode->GetBool();
-	}
-	return false;
-}
+#pragma region CServerGameEnts
 
 class CServerGameEnts : public IServerGameEnts
 {
@@ -2381,11 +2034,7 @@ void CServerGameEnts::SetDebugEdictBase(edict_t *base)
 	g_pDebugEdictBase = base;
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Marks entities as touching
-// Input  : *e1 - 
-//			*e2 - 
-//-----------------------------------------------------------------------------
 void CServerGameEnts::MarkEntitiesAsTouching( edict_t *e1, edict_t *e2 )
 {
 	CBaseEntity *entity = GetContainingEntity( e1 );
@@ -2402,6 +2051,7 @@ void CServerGameEnts::MarkEntitiesAsTouching( edict_t *e1, edict_t *e2 )
 
 void CServerGameEnts::FreeContainingEntity( edict_t *e )
 {
+	// let mapentities.cpp handle this
 	::FreeContainingEntity(e);
 }
 
@@ -2631,8 +2281,10 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 //	Msg("A:%i, N:%i, F: %i, P: %i\n", always, dontSend, fullCheck, PVS );
 }
 
+#pragma endregion
 
-CServerGameClients g_ServerGameClients;
+#pragma region CServerGameClients
+
 // INTERFACEVERSION_SERVERGAMECLIENTS_VERSION_3 is compatible with the latest since we're only adding things to the end, so expose that as well.
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameClients, IServerGameClients003, INTERFACEVERSION_SERVERGAMECLIENTS_VERSION_3, g_ServerGameClients );
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameClients, IServerGameClients, INTERFACEVERSION_SERVERGAMECLIENTS, g_ServerGameClients );
@@ -2654,17 +2306,17 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 		return false;
 
 	// Pass args to game rules and scripting system.
-	return g_pGameRules->ClientConnected(pEdict, pszName, pszAddress, reject, maxrejectlen) && g_scriptManager.CallHook("ClientConnect", pEdict, pszName, pszAddress, reject, maxrejectlen);
+	return g_pGameRules->ClientConnected(pEdict, pszName, pszAddress, reject, maxrejectlen);
+			// TODO: script hook here
+		//&& g_scriptManager.CallHook("ClientConnect", pEdict, pszName, pszAddress, reject, maxrejectlen);
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Called when a player is fully active (i.e. ready to receive messages)
-// Input  : *pEntity - the player
-//-----------------------------------------------------------------------------
 void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 {
 	MDLCACHE_CRITICAL_SECTION();
 	
+	// let game specific code handle this
 	::ClientActive( pEdict, bLoadGame );
 
 	// If we just loaded from a save file, call OnRestore on valid entities
@@ -2674,46 +2326,25 @@ void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 	{
 		// notify all entities that the player is now in the game
 		for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
-		{
 			pEntity->PostClientActive();
-		}
 	}
 
 
-	g_scriptManager.CallHook("ClientActive", pEdict, bLoadGame);
+	// TODO: script hook here
+	//g_scriptManager.CallHook("ClientActive", pEdict, bLoadGame);
 
 	// Tell the sound controller to check looping sounds
 	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
 	CSoundEnvelopeController::GetController().CheckLoopingSoundsForPlayer( pPlayer );
 	SceneManager_ClientActive( pPlayer );
-
-	#if defined( TF_DLL )
-		Assert( pPlayer );
-		if ( pPlayer && !pPlayer->IsFakeClient() )
-		{
-			CSteamID steamID;
-			if ( pPlayer->GetSteamID( &steamID ) )
-			{
-				GTFGCClientSystem()->ClientActive( steamID );
-			}
-			else
-			{
-				Log("WARNING: ClientActive, but we don't know his SteamID?\n");
-			}
-		}
-	#endif
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *pPlayer - the player
-//-----------------------------------------------------------------------------
 void CServerGameClients::ClientSpawned( edict_t *pPlayer )
 {
 	if ( g_pGameRules )
-	{
 		g_pGameRules->ClientSpawned( pPlayer );
-	}
+
+	// TODO: script hook here (ClientSpawned)
 }
 
 //-----------------------------------------------------------------------------
@@ -2723,6 +2354,8 @@ void CServerGameClients::ClientSpawned( edict_t *pPlayer )
 void CServerGameClients::ClientDisconnect( edict_t *pEdict )
 {
 	extern bool	g_fGameOver;
+
+	// TODO: script hook here (ClientDisconnect)
 
 	CBasePlayer *player = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
 	if ( player )
@@ -2784,7 +2417,10 @@ void CServerGameClients::ClientPutInServer( edict_t *pEntity, const char *player
 	if ( g_pClientPutInServerOverride )
 		g_pClientPutInServerOverride( pEntity, playername );
 	else
+		// game specific code
 		::ClientPutInServer( pEntity, playername );
+
+	// TODO: script hook (ClientPutInServer)
 }
 
 void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
@@ -3140,9 +2776,7 @@ void CServerGameClients::ClientEarPosition( edict_t *pEdict, Vector *pEarOrigin 
 {
 	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
 	if (pPlayer)
-	{
 		*pEarOrigin = pPlayer->EarPosition();
-	}
 	else
 	{
 		// Shouldn't happen
@@ -3223,17 +2857,14 @@ void CServerGameClients::ClientCommandKeyValues( edict_t *pEntity, KeyValues *pK
 		return;
 
 	if ( g_pGameRules )
-	{
 		g_pGameRules->ClientCommandKeyValues( pEntity, pKeyValues );
-	}
 }
+
+#pragma endregion
 
 #pragma region Messaging
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-static bf_write *g_pMsgBuffer = NULL;
+
 
 void EntityMessageBegin( CBaseEntity * entity, bool reliable /*= false*/ ) 
 {
@@ -3466,29 +3097,13 @@ private:
 EXPOSE_SINGLE_INTERFACE( CServerDLLSharedAppSystems, IServerDLLSharedAppSystems, SERVER_DLL_SHARED_APPSYSTEMS );
 
 
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
+
 void CServerGameTags::GetTaggedConVarList( KeyValues *pCvarTagList )
 {
 	if ( pCvarTagList && g_pGameRules )
-	{
 		g_pGameRules->GetTaggedConVarList( pCvarTagList );
-	}
 }
 
 
 
-#ifndef NO_STEAM
 
-CSteamID GetSteamIDForPlayerIndex( int iPlayerIndex )
-{
-	const CSteamID *pResult = engine->GetClientSteamIDByPlayerIndex( iPlayerIndex );
-	if ( pResult )
-		return *pResult;
-
-	// Return a bogus steam ID
-	return CSteamID();
-}
-
-#endif

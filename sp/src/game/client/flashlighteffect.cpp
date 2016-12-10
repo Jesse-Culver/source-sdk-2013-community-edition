@@ -19,46 +19,12 @@
 #include "c_basehlplayer.h"
 #endif // HL2_CLIENT_DLL
 
-#if defined( _X360 )
-extern ConVar r_flashlightdepthres;
-#else
-extern ConVar r_flashlightdepthres;
-#endif
+#include "flashlight_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern ConVar r_flashlightdepthtexture;
 
-void r_newflashlightCallback_f( IConVar *pConVar, const char *pOldString, float flOldValue );
-
-static ConVar r_newflashlight( "r_newflashlight", "1", FCVAR_CHEAT, "", r_newflashlightCallback_f );
-static ConVar r_swingflashlight( "r_swingflashlight", "1", FCVAR_CHEAT );
-static ConVar r_flashlightlockposition( "r_flashlightlockposition", "0", FCVAR_CHEAT );
-static ConVar r_flashlightfov( "r_flashlightfov", "45.0", FCVAR_CHEAT );
-static ConVar r_flashlightoffsetx( "r_flashlightoffsetx", "10.0", FCVAR_CHEAT );
-static ConVar r_flashlightoffsety( "r_flashlightoffsety", "-20.0", FCVAR_CHEAT );
-static ConVar r_flashlightoffsetz( "r_flashlightoffsetz", "24.0", FCVAR_CHEAT );
-static ConVar r_flashlightnear( "r_flashlightnear", "4.0", FCVAR_CHEAT );
-static ConVar r_flashlightfar( "r_flashlightfar", "750.0", FCVAR_CHEAT );
-static ConVar r_flashlightconstant( "r_flashlightconstant", "0.0", FCVAR_CHEAT );
-static ConVar r_flashlightlinear( "r_flashlightlinear", "100.0", FCVAR_CHEAT );
-static ConVar r_flashlightquadratic( "r_flashlightquadratic", "0.0", FCVAR_CHEAT );
-static ConVar r_flashlightvisualizetrace( "r_flashlightvisualizetrace", "0", FCVAR_CHEAT );
-static ConVar r_flashlightambient( "r_flashlightambient", "0.0", FCVAR_CHEAT );
-static ConVar r_flashlightshadowatten( "r_flashlightshadowatten", "0.35", FCVAR_CHEAT );
-static ConVar r_flashlightladderdist( "r_flashlightladderdist", "40.0", FCVAR_CHEAT );
-static ConVar mat_slopescaledepthbias_shadowmap( "mat_slopescaledepthbias_shadowmap", "16", FCVAR_CHEAT );
-static ConVar mat_depthbias_shadowmap(	"mat_depthbias_shadowmap", "0.0005", FCVAR_CHEAT  );
-
-
-void r_newflashlightCallback_f( IConVar *pConVar, const char *pOldString, float flOldValue )
-{
-	if( engine->GetDXSupportLevel() < 70 )
-	{
-		r_newflashlight.SetValue( 0 );
-	}	
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -336,6 +302,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 	state.m_flShadowAtten = r_flashlightshadowatten.GetFloat();
 	state.m_flShadowSlopeScaleDepthBias = mat_slopescaledepthbias_shadowmap.GetFloat();
 	state.m_flShadowDepthBias = mat_depthbias_shadowmap.GetFloat();
+	state.m_flShadowFilterSize = mat_shadow_filter.GetFloat();
 
 	if( m_FlashlightHandle == CLIENTSHADOW_INVALID_HANDLE )
 	{
@@ -368,9 +335,8 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 #endif
 }
 
-//-----------------------------------------------------------------------------
+// -- DEPRECATED -- 
 // Purpose: Do the headlight
-//-----------------------------------------------------------------------------
 void CFlashlightEffect::UpdateLightOld(const Vector &vecPos, const Vector &vecDir, int nDistance)
 {
 	if ( !m_pPointLight || ( m_pPointLight->key != m_nEntIndex ))
@@ -416,9 +382,7 @@ void CFlashlightEffect::UpdateLightOld(const Vector &vecPos, const Vector &vecDi
 	LightOffNew();
 }
 
-//-----------------------------------------------------------------------------
 // Purpose: Do the headlight
-//-----------------------------------------------------------------------------
 void CFlashlightEffect::UpdateLight(const Vector &vecPos, const Vector &vecDir, const Vector &vecRight, const Vector &vecUp, int nDistance)
 {
 	if ( !m_bIsOn )
@@ -436,9 +400,6 @@ void CFlashlightEffect::UpdateLight(const Vector &vecPos, const Vector &vecDir, 
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 void CFlashlightEffect::LightOffNew()
 {
 #ifndef NO_TOOLFRAMEWORK
@@ -463,6 +424,7 @@ void CFlashlightEffect::LightOffNew()
 }
 
 //-----------------------------------------------------------------------------
+// -- DEPRECATED --
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CFlashlightEffect::LightOffOld()
@@ -525,6 +487,7 @@ void CHeadlightEffect::UpdateLight( const Vector &vecPos, const Vector &vecDir, 
 	state.m_bEnableShadows = true;
 	state.m_pSpotlightTexture = m_FlashlightTexture;
 	state.m_nSpotlightTextureFrame = 0;
+	state.m_flShadowFilterSize = mat_shadow_filter.GetFloat();
 	
 	if( GetFlashlightHandle() == CLIENTSHADOW_INVALID_HANDLE )
 	{

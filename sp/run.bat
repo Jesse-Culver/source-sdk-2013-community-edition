@@ -23,7 +23,7 @@ if not exist "%steampath%\steam.exe" (
 
 echo Running game...
 
-@start /D "%steampath%\steamapps\common\Source SDK Base 2013 Singleplayer" hl2.exe -dev -console -novid -game "%CD%\game\sdk2013CE" -condebug
+@start /D "%steampath%\steamapps\common\Source SDK Base 2013 Singleplayer" hl2.exe -dev +sv_cheats 1 -console -novid -game "%CD%\game\sdk2013CE" -condebug
 
 if %ERRORLEVEL% NEQ 0 goto error
 goto success
@@ -32,6 +32,6 @@ goto success
 exit
 
 :error
-echo Error during launching game!
+echo Error launching game!
 pause
 exit

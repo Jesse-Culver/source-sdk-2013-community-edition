@@ -1949,9 +1949,10 @@ void MakeAllScales (void)
 		{
 			dface_t *f = &g_pFaces[i];
 
+			int iEdge;
 			// Draw the face's outline, then put text for its face index on it too.
 			CUtlVector<Vector> points;
-			for ( int iEdge = 0; iEdge < f->numedges; iEdge++ )
+			for ( iEdge = 0; iEdge < f->numedges; iEdge++ )
 			{
 				int v;
 				int se = dsurfedges[f->firstedge + iEdge];
@@ -1966,7 +1967,7 @@ void MakeAllScales (void)
 
 			// Draw the outline.
 			Vector vCenter( 0, 0, 0 );
-			for ( iEdge=0; iEdge < points.Count(); iEdge++ )
+			for ( iEdge = 0; iEdge < points.Count(); iEdge++ )
 			{
 				pPad->DrawLine( CSPVert( points[iEdge] ), CSPVert( points[(iEdge+1)%points.Count()] ) );
 				vCenter += points[iEdge];

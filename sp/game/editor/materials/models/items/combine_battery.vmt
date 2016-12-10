@@ -1,0 +1,18 @@
+"Standard"
+{
+	$basetexture		"models/items/combine_battery_color_blue"
+	$bumpmap		"models/items/combine_battery_normal"
+
+	//$phong			1
+	//$phongexponenttexture	"models/items/combine_battery_expon"
+	//$phongboost		3
+	//$phongfresnelranges	"[ 1.0 1.0 1.0 ]"
+	//$phongalbedotint		1
+
+	//$surfaceprop		plastic
+
+	//$selfillum			1
+	//$selfillummask 		"models/items/combine_battery_illumin_blue"
+
+	//$nodecal			1
+}

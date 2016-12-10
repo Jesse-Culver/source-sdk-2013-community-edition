@@ -1,0 +1,69 @@
+
+const static float PI = 3.1415926535897932f;
+
+float Vis_SmithJointApprox(float Roughness, float NoV, float NoL)
+{
+	float a = Roughness * Roughness;
+	float Vis_SmithV = NoL * (NoV * (1 - a) + a);
+	float Vis_SmithL = NoV * (NoL * (1 - a) + a);
+	return 0.5 * (1 / (Vis_SmithV + Vis_SmithL));
+}
+
+
+
+float D_GGX(float Roughness, float NoH)
+{
+	float a = Roughness * Roughness;
+	float a2 = a * a;
+	float d = ( NoH * a2 - NoH ) * NoH + 1;	// 2 mad
+	return a2 / ( PI*d*d );
+}
+
+
+void SpecularVisTerm(in float3 WPos, in float3 WNormal, in float3 EyeToWorld, in float Roughness, out float Vis)
+{
+	float3 ViewDir = EyeToWorld * -1; // Make it World->Eye
+
+	Vis = 0;
+	
+	float3 LColor;
+	float3 LDir;
+
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		LColor = PixelShaderGetLightColor(cLightInfo, i);
+		LDir = PixelShaderGetLightVector(WPos, cLightInfo, i);
+
+		float NdotL = saturate(dot(WNormal, LDir * -1));
+		float NdotV = saturate(abs(dot(WNormal, ViewDir)) + 1e-5);
+		
+		Vis = Vis_SmithJointApprox(Roughness, NdotV, NdotL);
+	}
+	
+}
+
+
+void DistTerm(float4 Attn, in float3 WPos, in float3 WNormal, in float3 EyeToWorld, in float Roughness, out float D)
+{
+	// TODO: make sure EyeToWorld and LDir need to be multiplied by -1 here
+
+	float3 ViewDir = EyeToWorld * -1; // Make it World->Eye
+
+	D = 0;
+	
+	float3 LColor;
+	float3 LDir;
+
+	for (int i = 0; i < NUM_LIGHTS; i++)
+	{
+		LColor = PixelShaderGetLightColor(cLightInfo, i) * Attn[i];
+		LDir = PixelShaderGetLightVector(WPos, cLightInfo, i) * -1;
+
+		float3 H = normalize(ViewDir + LDir);
+		//float3 H = normalize(LDir);
+		float NdotH = saturate(dot(WNormal, H));
+		
+		D = D_GGX(Roughness, NdotH) * LColor;
+	}
+	
+}

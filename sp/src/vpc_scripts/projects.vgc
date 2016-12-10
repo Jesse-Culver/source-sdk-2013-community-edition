@@ -24,6 +24,17 @@ $Project "client"
 	//"game\client\client_episodic.vpc"	[($WIN32||$X360||$POSIX) && $EPISODIC]
 	"game\client\client_sdk2013CE.vpc"	[($WIN32||$X360||$POSIX)]
 }
+
+$Project "client_editor"
+{
+	"game\client\client_editor.vpc"
+}
+
+$Project "server_editor"
+{
+	"game\server\server_editor.vpc"
+}
+
 $Project "fgdlib"
 {
 	"fgdlib\fgdlib.vpc" [$WIN32]
@@ -33,7 +44,7 @@ $Project "game_shader_dx9"
 {
 	//"materialsystem\stdshaders\game_shader_dx9_hl2.vpc" [$HL2]
 	//"materialsystem\stdshaders\game_shader_dx9_episodic.vpc"  [$EPISODIC]
-	//"materialsystem\stdshaders\game_shader_dx9_sdk2013CE.vpc"
+	"materialsystem\stdshaders\game_shader_dx9_sdk2013CE.vpc"
 }
 
 $Project "glview"

@@ -1,22 +1,76 @@
+#pragma once
 
-struct VMFunction {};
-struct VMObject {};
+#include "TaggedValue.h"
+#include "VMInstruction.h"
 
-enum VMType {
-	VM_NULL, VM_INT, VM_BOOL, VM_FLOAT, VM_STRING, VM_FUNCTION, VM_OBJECT
-};
+// Macros to log when objects are created and destroyed
+#define VM_CLASS_CONSTRUCTOR(type) {ScriptLog("New " ## #type " created at 0x%X.", this);}
+#define VM_CLASS_DESTRUCTOR(type) {ScriptLog("Destroyed " ## #type " at 0x%X.", this);}
 
-// Tagged Value
-struct Value
+
+
+/****************************************
+	VMArray
+		Numerically Indexed Array
+****************************************/
+class DLL_API VMArray
 {
-	VMType type;
-	union {
-		int i;
-		bool b;
-		float f;
-		const char* str;
-		VMFunction func;
-		VMObject obj;
-	};
+private:
+	Value* values;
+
+	// Size
+	unsigned int size;
+
+	// Allocated Size
+	unsigned int capacity;
+public:
+	
+
+/// Constructors ///
+
+	VMArray(unsigned int size = 2);
+	~VMArray();
+
+/// Mutators ///
+
+	void Set(unsigned int idx, const Value value);
+
+/// Inspectors / Accessors ///
+
+	inline const Value& Get(unsigned idx) const { return idx < size - 1 ? values[idx] : Null; }
+
+	// Constant VMArray[i]
+	const Value& operator[](unsigned int i) const { return Get(i); };
+
+	// Unsafe VMArray[i]
+	Value& operator[](unsigned i) { return values[i]; };
+
+
+	inline const unsigned int Size() const { return size; }
+	inline const unsigned int Capacity() const { return capacity; }
 };
+
+
+/****************************************
+	VM Function
+****************************************/
+struct VMFunction
+{
+	// Pointer to the first instruction.
+	Instruction* code;
+
+	// Array of all constants within this function
+	VMArray constants;
+};
+
+
+
+/****************************************
+	VM Object
+****************************************/
+struct VMObject
+{
+
+};
+
 

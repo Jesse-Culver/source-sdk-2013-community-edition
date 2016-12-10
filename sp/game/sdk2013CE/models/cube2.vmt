@@ -1,0 +1,10 @@
+"Standard"
+{
+	$surfaceprop	"metal"
+	$basetexture	"pbr/Tiles01_basecolor"
+	$bumpmap		"pbr/Tiles01_normal"
+	$specmap		"pbr/Tiles01_spec"
+	$gloss			0
+	
+	$halflambert	0
+}

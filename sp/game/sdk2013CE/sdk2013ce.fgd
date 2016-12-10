@@ -83,7 +83,7 @@
 ]
 
 // lightprop("models/editor/spot.mdl") <---- use this once the orientation is unfucked
-@PointClass base(Targetname, Parentname, Angles) size(-2 -2 -2, 2 2 2) frustum(lightfov,nearz,farz,lightcolor,-1) = env_projectedtexture : 
+@BaseClass base(Targetname, Parentname, Angles) size(-2 -2 -2, 2 2 2) frustum(lightfov,nearz,farz,lightcolor,-1) lightprop("models/editor/spot.mdl") = env_projectedtexture_base : 
 	"Projected texture entity."
 [
 	spawnflags(flags) =
@@ -119,11 +119,23 @@
 	lightcolor(color255)		: "Light Color" : "255 255 255 200" : "Light Color RGB-Intensity"
 	cameraspace(integer)		: "Camera Space" : 0 : "Angles are interpreted as being relative to camera."
 	texturename(material)		: "Texture" : : "path/texture to be projected. Relative to main/materials/"
+	
+	constant(float)	: "Constant Falloff" : 0
+	linear(float)	: "Linear Falloff" : 100
+	quadratic(float): "Quadratic Falloff": 0
 
 	// Inputs
 	input TurnOn(void)		: "Turn on the texture"
 	input TurnOff(void)		: "Turn off the texture"
 	input SetFOV(float)		: "Set FOV"
+]
+
+@PointClass base(env_projectedtexture_base) frustum(lightfov,nearz,farz,lightcolor,-1) lightprop("models/editor/spot.mdl") = env_projectedtexture : ""
+[
+]
+
+@PointClass base(env_projectedtexture_base) frustum(lightfov,nearz,farz,lightcolor,-1) lightprop("models/editor/spot.mdl") = light_dynamic : ""
+[
 ]
 
 @NPCClass base(BaseNPC) studio("models/missile_defense.mdl") = npc_missiledefense : "A turret who takes down rockets from the player"
@@ -154,4 +166,8 @@
 @PointClass base(BasePropPhysics, RenderFields) studioprop() sphere(radius) = prop_sphere : "Creates a perfect sphere."
 [
 	radius(float) : "Radius" : 12 : ""
+]
+
+@PointClass sphere(1) = env_swarm : "env_swarm"
+[
 ]

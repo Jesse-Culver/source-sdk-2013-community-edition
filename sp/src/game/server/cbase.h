@@ -103,6 +103,7 @@ extern void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseE
 
 // used by suit voice to indicate damage sustained and repaired type to player
 
+// TODO: these enums really shouldn't be here
 enum
 {
 	itbd_Paralyze = 0,

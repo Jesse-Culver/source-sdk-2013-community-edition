@@ -17,8 +17,10 @@ ipch
 *.sdf
 *.opensdf
 *.idb
-*.vcxproj
-*.sln
+
+# Allow these two because VPC is a pain
+# *.vcxproj
+# *.sln
 
 # OSX/Linux build products
 *.mak

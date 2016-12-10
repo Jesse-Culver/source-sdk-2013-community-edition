@@ -1,0 +1,487 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{1F9E3602-2A81-388D-8450-0F193A88733D}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>cefsimple</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cefsimple.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cefsimple</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cefsimple.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cefsimple</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4127;4244;4481;4512;4701;4702;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WIN32;_WIN32;_WINDOWS;UNICODE;_UNICODE;WINVER=0x0602;_WIN32_WINNT=0x602;NOMINMAX;WIN32_LEAN_AND_MEAN;_HAS_EXCEPTIONS=0;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WIN32;_WIN32;_WINDOWS;UNICODE;_UNICODE;WINVER=0x0602;_WIN32_WINNT=0x602;NOMINMAX;WIN32_LEAN_AND_MEAN;_HAS_EXCEPTIONS=0;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message>Adding manifest...														</Message>
+      <Command>setlocal
+mt.exe -nologo -manifest "C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/cefsimple.exe.manifest" "C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/compatibility.manifest" -outputresource:"C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/cefsimple.exe";#1
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Debug/d3dcompiler_43.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/d3dcompiler_43.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Debug/d3dcompiler_47.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/d3dcompiler_47.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Debug/libcef.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/libcef.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Debug/libEGL.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/libEGL.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Debug/libGLESv2.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/libGLESv2.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Debug/natives_blob.bin C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/natives_blob.bin
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Debug/snapshot_blob.bin C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/snapshot_blob.bin
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/cef.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef_100_percent.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/cef_100_percent.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef_200_percent.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/cef_200_percent.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef_extensions.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/cef_extensions.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/devtools_resources.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/devtools_resources.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/icudtl.dat C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/icudtl.dat
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_directory C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/locales C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/locales
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Debug\libcef.lib;..\libcef_dll_wrapper\Debug\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/cefsimple.lib</ImportLibrary>
+      <LargeAddressAware>true</LargeAddressAware>
+      <ProgramDataBaseFile>C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Debug/cefsimple.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Manifest>
+      <AdditionalManifestFiles>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\cefsimple.exe.manifest;</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4100;4127;4244;4481;4512;4701;4702;4996</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WIN32;_WIN32;_WINDOWS;UNICODE;_UNICODE;WINVER=0x0602;_WIN32_WINNT=0x602;NOMINMAX;WIN32_LEAN_AND_MEAN;_HAS_EXCEPTIONS=0;NDEBUG;_NDEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WIN32;_WIN32;_WINDOWS;UNICODE;_UNICODE;WINVER=0x0602;_WIN32_WINNT=0x602;NOMINMAX;WIN32_LEAN_AND_MEAN;_HAS_EXCEPTIONS=0;NDEBUG;_NDEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message>Adding manifest...														</Message>
+      <Command>setlocal
+mt.exe -nologo -manifest "C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/cefsimple.exe.manifest" "C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/compatibility.manifest" -outputresource:"C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/cefsimple.exe";#1
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Release/d3dcompiler_43.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/d3dcompiler_43.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Release/d3dcompiler_47.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/d3dcompiler_47.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Release/libcef.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/libcef.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Release/libEGL.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/libEGL.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Release/libGLESv2.dll C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/libGLESv2.dll
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Release/natives_blob.bin C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/natives_blob.bin
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Release/snapshot_blob.bin C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/snapshot_blob.bin
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/cef.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef_100_percent.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/cef_100_percent.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef_200_percent.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/cef_200_percent.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/cef_extensions.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/cef_extensions.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/devtools_resources.pak C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/devtools_resources.pak
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_if_different C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/icudtl.dat C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/icudtl.dat
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -E copy_directory C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/Resources/locales C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/locales
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\Release\libcef.lib;..\libcef_dll_wrapper\Release\libcef_dll_wrapper.lib;comctl32.lib;rpcrt4.lib;shlwapi.lib;ws2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImportLibrary>C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/cefsimple.lib</ImportLibrary>
+      <LargeAddressAware>true</LargeAddressAware>
+      <ProgramDataBaseFile>C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/Release/cefsimple.pdb</ProgramDataBaseFile>
+      <SubSystem>Windows</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+    <Manifest>
+      <AdditionalManifestFiles>C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\cefsimple.exe.manifest;</AdditionalManifestFiles>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -HC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef -BC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef --check-stamp-file C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+C:\Users\jeffr\Home\Bin\cmake\bin\cmake.exe -HC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef -BC:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef --check-stamp-file C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/cefsimple/CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeLists.txt;C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\simple_app.h" />
+    <ClInclude Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\simple_handler.h" />
+    <ClInclude Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\resource.h" />
+    <ClCompile Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\simple_app.cc"  />
+    <ClCompile Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\simple_handler.cc"  />
+    <ResourceCompile Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\cefsimple.rc"  />
+    <ClCompile Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\cefsimple_win.cc"  />
+    <ClCompile Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\simple_handler_win.cc"  />
+    <None Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\res\cefsimple.ico" />
+    <None Include="C:\Users\jeffr\Documents\GitHub\SourceCommunityEdition\sp\src\thirdparty\cef\cefsimple\res\small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/ZERO_CHECK.vcxproj">
+      <Project>B1B9BCC7-0971-332E-9D5E-64D6DA912A23</Project>
+    </ProjectReference>
+    <ProjectReference Include="C:/Users/jeffr/Documents/GitHub/SourceCommunityEdition/sp/src/thirdparty/cef/libcef_dll_wrapper/libcef_dll_wrapper.vcxproj">
+      <Project>26CE5243-9658-3573-91BF-D1CEFF90CAE3</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

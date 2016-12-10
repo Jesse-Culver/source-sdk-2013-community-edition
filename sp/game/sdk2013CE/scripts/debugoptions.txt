@@ -1,26 +1,84 @@
 DebugMenu
 {
 	"width"		"600"
-	"height"	"300"
+	"height"	"400"
 
-	Performance
+	General
 	{
+		"Console Notify"
+		{
+			"incrementcvar"	"toggle con_notifytime 0 8"
+		}
+		
 		r_speeds
 		{
 			"incrementcvar"	"r_speeds 0 10 1"
 		}
-		host_speeds
-		{
-			"togglecvar"	"host_speeds"
-		}
+		
+		//host_speeds
+		//{
+		//	"togglecvar"	"host_speeds"
+		//}
+		
 		"FPS"
 		{
-			"togglecvar"	"cl_showfps"
+			"command"	"toggle cl_showfps"
 		}
 		"Position"
 		{
-			"togglecvar"	"cl_showpos"
+			"command"	"toggle cl_showpos"
 		}
+		
+		"Demo UI"
+		{
+			"command"	"demoui"
+		}
+		
+		"Demo UI 2"
+		{
+			"command"	"demoui2"
+		}
+		
+		"Fog UI"
+		{
+			"command"	"fogui"
+		}
+		
+		"Color Correction UI"
+		{
+			"command"	"colorcorrectionui"
+		}
+		
+		"Perf UI"
+		{
+			"command"	"perfui"
+		}
+		
+		"Entity Report"
+		{
+			"togglecvar" "cl_entityreport"
+		}
+		
+		"VPROF Graph"
+		{
+			"togglecvar"	"vprof_graph"
+		}
+		
+		"Net Graph"
+		{
+			"togglecvar"	"net_graph"
+		}
+		
+		"VGUI Draw Tree"
+		{
+			"togglecvar"	"vgui_drawtree"
+		}
+		
+		"Texture Budget"
+		{
+			"togglecvar"	"showbudget_texture"
+		}
+		
 	}
 	"MatSys"
 	{
@@ -64,6 +122,15 @@ DebugMenu
 		{
 			"togglecvar"	"mat_overbright"
 		}
+		
+		"Texture List"
+		{
+			"togglecvar"	"mat_texture_list"
+		}
+		
+		
+		
+		
 	}
 	Renderer
 	{
@@ -139,6 +206,11 @@ DebugMenu
 		"Water Surface"
 		{
 			"togglecvar"	"r_drawwatersurface"
+		}
+		
+		"Shadows"
+		{
+			"togglecvar"	"r_shadows"
 		}
 	}
 

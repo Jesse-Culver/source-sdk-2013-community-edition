@@ -10,25 +10,22 @@
 #define DLL_API __declspec(dllimport)
 #endif
 
-#ifndef SOURCE_ENGINE
-#define SOURCE_ENGINE
-#endif
-
 // standard libs
 #include <cstdarg>
 
-#ifdef SOURCE_ENGINE
-
-//tier0
-#include <tier0/dbg.h>
 // tier1
-#include <tier1/utlvector.h>
 #include <Color.h>
 
-#else
-// Non-source implementations
+#include "tier1\utlvector.h"
 
-#endif
+#ifndef SOURCE_ENGINE
+typedef unsigned int uint;
+#endif 
+
+
+
+
+void _Msg(const Color& clr, const char* pMsg, char* buffer);
 
 #include "util.h"
 
@@ -44,3 +41,6 @@
 #define COLOR_WHITE		Color(255, 255, 255, 255)
 #define COLOR_BLACK		Color(0, 0, 0, 255)
 #define COLOR_CYAN		Color(0, 255, 255, 255)
+#define COLOR_ORANGE	Color(255, 127, 0, 255)
+
+typedef int ScriptHook;
