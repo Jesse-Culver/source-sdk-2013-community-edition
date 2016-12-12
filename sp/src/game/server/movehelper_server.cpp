@@ -392,7 +392,11 @@ bool CMoveHelperServer::PlayerFallingDamage( void )
 		if ( g_pGameRules->FlPlayerFallDeathDoesScreenFade( m_pHostPlayer ) )
 		{
 			color32 black = {0, 0, 0, 255};
-			UTIL_ScreenFade( m_pHostPlayer, black, 0, 9999, FFADE_OUT | FFADE_STAYOUT );
+
+			// VXP: Why 9999 if we have FFADE_STAYOUT flag? Valve, pls fi... Oh, okay
+			// If serious, this causes bug when player dies after falling (9999 converts to 65536 that doesn't fit in 16 bits (see UTIL_ScreenFadeBuild))
+		//	UTIL_ScreenFade( m_pHostPlayer, black, 0, 9999, FFADE_OUT | FFADE_STAYOUT );
+			UTIL_ScreenFade( m_pHostPlayer, black, 0, 1, FFADE_OUT | FFADE_STAYOUT );
 		}
 		return(false);
 	}
