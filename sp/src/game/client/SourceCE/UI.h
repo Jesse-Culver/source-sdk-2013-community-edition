@@ -22,9 +22,9 @@ protected:
 	ushort width, height;
 	XMLElement* root;
 public:
-	bool enabled = true;
+	bool enabled;
 
-	UIPanel(const char* name) : name(name) {};
+	UIPanel(const char* name) : name(name) { enabled = true; };
 
 	XMLElement* RootElement() { return root; };
 
